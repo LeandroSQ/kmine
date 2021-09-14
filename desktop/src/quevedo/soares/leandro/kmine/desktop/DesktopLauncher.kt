@@ -14,6 +14,7 @@ object DesktopLauncher {
             width = 800
             height = 400
             samples = 16
+            resizable = false
             vSyncEnabled = true
             foregroundFPS = 0
         })

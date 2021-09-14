@@ -1,12 +1,12 @@
 package quevedo.soares.leandro.kmine
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
-import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Vector3
+
 
 class World {
 
@@ -31,49 +31,45 @@ class World {
     }
 
     private fun setupModel() {
-        /*this.model = ModelBuilder().createBox(
-            5f, 5f, 5f,
-            Material(ColorAttribute.createDiffuse(Color.GREEN)),
-            (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong()
-        )        */
         this.modelBatch = ModelBatch()
 
-        val vertices = doubleArrayOf(
+        val vertices = floatArrayOf(
+
             // Front face
-            -1.0, -1.0,  1.0,
-            1.0, -1.0,  1.0,
-            1.0,  1.0,  1.0,
-            -1.0,  1.0,  1.0,
+            -1.0f, -1.0f,  1.0f,   0f, 0f, 1f,
+            1.0f,  -1.0f,  1.0f,   0f, 0f, 1f,
+            1.0f,   1.0f,  1.0f,   0f, 0f, 1f,
+            -1.0f,  1.0f,  1.0f,   0f, 0f, 1f,
 
             // Back face
-            -1.0, -1.0, -1.0,
-            -1.0,  1.0, -1.0,
-            1.0,  1.0, -1.0,
-            1.0, -1.0, -1.0,
+            -1.0f, -1.0f, -1.0f,   0f, 0f, -1f,
+            -1.0f,  1.0f, -1.0f,   0f, 0f, -1f,
+            1.0f,  1.0f, -1.0f,    0f, 0f, -1f,
+            1.0f, -1.0f, -1.0f,    0f, 0f, -1f,
 
             // Top face
-            -1.0,  1.0, -1.0,
-            -1.0,  1.0,  1.0,
-            1.0,  1.0,  1.0,
-            1.0,  1.0, -1.0,
+            -1.0f,  1.0f, -1.0f,   0f, 1f, 0f,
+            -1.0f,  1.0f,  1.0f,   0f, 1f, 0f,
+            1.0f,  1.0f,  1.0f,    0f, 1f, 0f,
+            1.0f,  1.0f, -1.0f,    0f, 1f, 0f,
 
             // Bottom face
-            -1.0, -1.0, -1.0,
-            1.0, -1.0, -1.0,
-            1.0, -1.0,  1.0,
-            -1.0, -1.0,  1.0,
+            -1.0f, -1.0f, -1.0f,   0f, -1f, 0f,
+            1.0f, -1.0f, -1.0f,    0f, -1f, 0f,
+            1.0f, -1.0f,  1.0f,    0f, -1f, 0f,
+            -1.0f, -1.0f,  1.0f,   0f, -1f, 0f,
 
             // Right face
-            1.0, -1.0, -1.0,
-            1.0,  1.0, -1.0,
-            1.0,  1.0,  1.0,
-            1.0, -1.0,  1.0,
+            1.0f, -1.0f, -1.0f,    1f, 0f, 0f,
+            1.0f,  1.0f, -1.0f,    1f, 0f, 0f,
+            1.0f,  1.0f,  1.0f,    1f, 0f, 0f,
+            1.0f, -1.0f,  1.0f,    1f, 0f, 0f,
 
             // Left face
-            -1.0, -1.0, -1.0,
-            -1.0, -1.0,  1.0,
-            -1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0
+            -1.0f, -1.0f, -1.0f,   -1f, 0f, 0f,
+            -1.0f, -1.0f,  1.0f,   -1f, 0f, 0f,
+            -1.0f,  1.0f,  1.0f,   -1f, 0f, 0f,
+            -1.0f,  1.0f, -1.0f,   -1f, 0f, 0f
         )
         val indices = shortArrayOf(
             0,  1,  2,      0,  2,  3,    // front
@@ -91,16 +87,13 @@ class World {
 
         val attributes = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal).toLong()
         val meshBuilder = modelBuilder.part("mesh", GL20.GL_TRIANGLES, attributes, material)
-        val meshPiece = Mesh(
-            false, vertices.size, indices.size,
-            VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
-            VertexAttribute(VertexAttributes.Usage.Normal, 3, "a_normal")
-//            VertexAttribute(VertexAttributes.Usage.ColorPacked, 4, "a_color")
-        )
+        val meshPiece = Mesh(true, vertices.size, indices.size, VertexAttribute.Position(), VertexAttribute.Normal()).apply {
+            setVertices(vertices)
+            setIndices(indices)
+        }
         meshBuilder.addMesh(meshPiece)
 
         this.model = modelBuilder.end()
-
     }
 
     fun render(camera: Camera) {
@@ -112,7 +105,7 @@ class World {
     fun dispose() {
         this.modelBatch.dispose()
         this.model.dispose()
-        this.mesh.dispose()
+//        this.mesh.dispose()
     }
 
 }
