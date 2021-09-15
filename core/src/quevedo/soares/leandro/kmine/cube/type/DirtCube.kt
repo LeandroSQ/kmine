@@ -7,13 +7,20 @@ import quevedo.soares.leandro.kmine.cube.CubeTexture
 
 class DirtCube : Cube {
 
-	constructor(position: Vector3) : super(position, CubeFaceTextureMap(
+	override var textureMap = CubeFaceTextureMap(
 		top = CubeTexture.DIRT,
 		bottom = CubeTexture.DIRT,
 		front = CubeTexture.DIRT,
 		back = CubeTexture.DIRT,
 		left = CubeTexture.DIRT,
 		right = CubeTexture.DIRT
-	))
+	)
 
+	constructor() : super() {
+
+	}
+
+	constructor(position: Vector3) : super(position) {
+
+	}
 }

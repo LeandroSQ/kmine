@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
-import quevedo.soares.leandro.kmine.cube.Cube
+import com.badlogic.gdx.math.Vector3
 
 class World {
 
@@ -14,7 +14,7 @@ class World {
 
     private lateinit var modelBatch: ModelBatch
 
-    private lateinit var chunk: CubeChunk
+    private var chunks = arrayListOf<Chunk>()
 
     fun create() {
         this.setupModel()
@@ -31,19 +31,28 @@ class World {
     private fun setupModel() {
         this.modelBatch = ModelBatch()
 
-        this.chunk = CubeChunk()
-        this.chunk.generate()
+        // Generates the chunks
+        for(x in 0 until 5) {
+            for(z in 0 until 5) {
+                val chunk = TerrainBuilder.generateChunk(origin = Vector3(x.toFloat() * 16, 0f, z.toFloat() * 16))
+                this.chunks.add(chunk)
+            }
+        }
+
+        // Generate the chunks meshes
+        this.chunks.forEach { it.generateMesh() }
     }
 
     fun render(camera: Camera) {
         this.modelBatch.begin(camera)
-        this.chunk.render(this.modelBatch, this.environment)
+        this.chunks.forEach { it.render(this.modelBatch, this.environment) }
         this.modelBatch.end()
     }
 
     fun dispose() {
         this.modelBatch.dispose()
-        this.chunk.dispose()
+        this.chunks.forEach { it.dispose() }
+        Chunk.disposeTextures()
     }
 
 }

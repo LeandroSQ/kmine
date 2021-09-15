@@ -5,16 +5,18 @@ import quevedo.soares.leandro.kmine.cube.Cube
 import quevedo.soares.leandro.kmine.cube.CubeFaceTextureMap
 import quevedo.soares.leandro.kmine.cube.CubeTexture
 
-class GrassCube : Cube {
+class GlassCube : Cube {
 
 	override var textureMap = CubeFaceTextureMap(
-		top = CubeTexture.GRASS_TOP,
-		bottom = CubeTexture.DIRT,
-		front = CubeTexture.GRASS_SIDES,
-		back = CubeTexture.GRASS_SIDES,
-		left = CubeTexture.GRASS_SIDES,
-		right = CubeTexture.GRASS_SIDES
+		top = CubeTexture.GLASS,
+		bottom = CubeTexture.GLASS,
+		front = CubeTexture.GLASS,
+		back = CubeTexture.GLASS,
+		left = CubeTexture.GLASS,
+		right = CubeTexture.GLASS
 	)
+
+	override var isTranslucent = true
 
 	constructor() : super() {
 
@@ -23,5 +25,4 @@ class GrassCube : Cube {
 	constructor(position: Vector3) : super(position) {
 
 	}
-
 }

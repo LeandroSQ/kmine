@@ -7,13 +7,21 @@ import quevedo.soares.leandro.kmine.cube.CubeTexture
 
 class StoneCube : Cube {
 
-	constructor(position: Vector3) : super(position, CubeFaceTextureMap(
+	override var textureMap = CubeFaceTextureMap(
 		top = CubeTexture.STONE,
 		bottom = CubeTexture.STONE,
 		front = CubeTexture.STONE,
 		back = CubeTexture.STONE,
 		left = CubeTexture.STONE,
 		right = CubeTexture.STONE
-	))
+	)
+
+	constructor() : super() {
+
+	}
+
+	constructor(position: Vector3) : super(position) {
+
+	}
 
 }

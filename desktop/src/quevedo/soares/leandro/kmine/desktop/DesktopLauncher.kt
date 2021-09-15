@@ -17,10 +17,10 @@ object DesktopLauncher {
             x = -1
             y = -1
             initialBackgroundColor = Color(60 / 255f, 174 / 255f, 243 / 255f, 1f)
-            width = 800
-            height = 400
-            useHDPI = true
-            samples = 1
+            width = 640
+            height = 480
+//            useHDPI = true
+            samples = 3
             vSyncEnabled = true
             foregroundFPS = 0
         })

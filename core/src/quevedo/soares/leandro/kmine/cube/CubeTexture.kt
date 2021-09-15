@@ -22,6 +22,7 @@ enum class CubeTexture(val regionName: String) {
 	FURNACE_ON_FRONT("furnace_on_front"),
 	FURNACE_SIDES("furnace_sides"),
 	FURNACE_TOP("furnace_top"),
+	GLASS("glass"),
 	GOLD_ORE("gold_ore"),
 	GRASS_SIDES("grass_sides"),
 	GRASS_TOP("grass_top"),

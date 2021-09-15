@@ -43,55 +43,57 @@ furnace_sides
 	bounds: 69, 19, 16, 16
 furnace_top
 	bounds: 86, 19, 16, 16
-gold_ore
+glass
 	bounds: 103, 19, 16, 16
-grass_sides
+gold_ore
 	bounds: 120, 19, 16, 16
-grass_top
+grass_sides
 	bounds: 137, 19, 16, 16
-iron_ore
+grass_top
 	bounds: 154, 19, 16, 16
-lava
+iron_ore
 	bounds: 171, 19, 16, 16
-leaves1
+lava
 	bounds: 188, 19, 16, 16
-leaves2
+leaves1
 	bounds: 205, 19, 16, 16
-leaves3
+leaves2
 	bounds: 222, 19, 16, 16
-leaves4
+leaves3
 	bounds: 239, 19, 16, 16
-log_sides
+leaves4
 	bounds: 1, 36, 16, 16
-log_top
+log_sides
 	bounds: 18, 36, 16, 16
-red_flower
+log_top
 	bounds: 35, 36, 16, 16
-sand
+red_flower
 	bounds: 52, 36, 16, 16
-sapling
+sand
 	bounds: 69, 36, 16, 16
-stone
+sapling
 	bounds: 86, 36, 16, 16
-tile059
+stone
 	bounds: 103, 36, 16, 16
-tile060
+tile059
 	bounds: 120, 36, 16, 16
-tnt_bottom
+tile060
 	bounds: 137, 36, 16, 16
-tnt_sides
+tnt_bottom
 	bounds: 154, 36, 16, 16
-tnt_top
+tnt_sides
 	bounds: 171, 36, 16, 16
-torch
+tnt_top
 	bounds: 188, 36, 16, 16
-water
+torch
 	bounds: 205, 36, 16, 16
-wooden_door_bottom
+water
 	bounds: 222, 36, 16, 16
-wooden_door_top
+wooden_door_bottom
 	bounds: 239, 36, 16, 16
-wooden_plank
+wooden_door_top
 	bounds: 1, 53, 16, 16
-yellow_flower
+wooden_plank
 	bounds: 18, 53, 16, 16
+yellow_flower
+	bounds: 35, 53, 16, 16
