@@ -19,7 +19,7 @@ class Game : ApplicationAdapter() {
     private lateinit var hudCamera: OrthographicCamera
 
     private lateinit var gameCamera: PerspectiveCamera
-    private lateinit var cameraController: CameraInputController
+//    private lateinit var cameraController: CameraInputController
 
     private var world = World()
 
@@ -31,16 +31,16 @@ class Game : ApplicationAdapter() {
 
     private fun setupGameCamera() {
         this.gameCamera = PerspectiveCamera(67f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).apply {
-            position.set(-8f, -8f, 20f)
-            lookAt(0f, 0f, 0f)
+            position.set(8f, 16f, 8f)
+            //lookAt(0f, 16f, 0f)
             near = 1f
             far = 300f
             update()
         }
 
-        this.cameraController = CameraInputController(this.gameCamera)
+//        this.cameraController = CameraInputController(this.gameCamera)
 //        this.cameraController = FirstPersonCameraController(this.gameCamera)
-        Gdx.input.inputProcessor = this.cameraController
+//        Gdx.input.inputProcessor = this.cameraController
     }
 
     private fun setupHUD() {
@@ -58,33 +58,44 @@ class Game : ApplicationAdapter() {
         Gdx.gl.glEnable(GL20.GL_CULL_FACE)
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
 
-        //this.moveCamera()
-        this.cameraController.update()
+        this.moveCamera()
+//        this.cameraController.update()
 
         this.world.render(this.gameCamera)
 
         this.renderHUD()
     }
 
-
-
     private fun moveCamera() {
-        val speed = 0.25f
+        val speed = 8.25f * Gdx.graphics.deltaTime
+        var cameraDirty = false
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-            val direction = this.gameCamera.direction.cpy().crs(gameCamera.up).nor()
-            /*direction.y = 0f
-            direction.x *= speed
-            direction.z *= speed*/
-            this.gameCamera.translate(direction)
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            this.gameCamera.rotate(Vector3.Y, (speed * Math.PI * 3).toFloat())
+            cameraDirty = true
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-            val direction = this.gameCamera.direction.cpy().rotate(Vector3.Y, 90f)
-            direction.y = 0f
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            this.gameCamera.rotate(Vector3.Y, -(speed * Math.PI * 3).toFloat())
+            cameraDirty = true
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            val direction = this.gameCamera.direction.cpy().crs(gameCamera.up).nor()
+            direction.y *= -speed
+            direction.x *= -speed
+            direction.z *= -speed
+            this.gameCamera.translate(direction)
+            cameraDirty = true
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            val direction = this.gameCamera.direction.cpy().crs(gameCamera.up).nor()
+            direction.y *= speed
             direction.x *= speed
             direction.z *= speed
             this.gameCamera.translate(direction)
+            cameraDirty = true
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -93,6 +104,7 @@ class Game : ApplicationAdapter() {
             direction.x *= speed
             direction.z *= speed
             this.gameCamera.translate(direction)
+            cameraDirty = true
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
@@ -101,15 +113,35 @@ class Game : ApplicationAdapter() {
             direction.x *= -speed
             direction.z *= -speed
             this.gameCamera.translate(direction)
+            cameraDirty = true
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            val direction = this.gameCamera.up.cpy()
+            direction.y *= speed
+            direction.x *= speed
+            direction.z *= speed
+            this.gameCamera.translate(direction)
+            cameraDirty = true
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+            val direction = this.gameCamera.up.cpy()
+            direction.y *= -speed
+            direction.x *= -speed
+            direction.z *= -speed
+            this.gameCamera.translate(direction)
+            cameraDirty = true
+        }
+
+        if(cameraDirty) this.gameCamera.update()
     }
 
     private fun renderHUD() {
         this.hudCamera.update()
         this.hudBatch.projectionMatrix = this.hudCamera.combined
         this.hudBatch.begin()
-        this.font.draw(this.hudBatch, "FPS ${Gdx.graphics.framesPerSecond}", 0f, this.font.lineHeight)
+        this.font.draw(this.hudBatch, "FPS: ${Gdx.graphics.framesPerSecond}", 0f, this.font.lineHeight)
         this.hudBatch.end()
     }
 
