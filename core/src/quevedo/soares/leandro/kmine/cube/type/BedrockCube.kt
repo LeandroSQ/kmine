@@ -5,15 +5,15 @@ import quevedo.soares.leandro.kmine.cube.Cube
 import quevedo.soares.leandro.kmine.cube.CubeFaceTextureMap
 import quevedo.soares.leandro.kmine.cube.CubeTexture
 
-class GrassCube : Cube {
+class BedrockCube : Cube {
 
 	constructor(position: Vector3) : super(position, CubeFaceTextureMap(
-		top = CubeTexture.GRASS_TOP,
-		bottom = CubeTexture.DIRT,
-		front = CubeTexture.GRASS_SIDES,
-		back = CubeTexture.GRASS_SIDES,
-		left = CubeTexture.GRASS_SIDES,
-		right = CubeTexture.GRASS_SIDES
+		top = CubeTexture.BEDROCK,
+		bottom = CubeTexture.BEDROCK,
+		front = CubeTexture.BEDROCK,
+		back = CubeTexture.BEDROCK,
+		left = CubeTexture.BEDROCK,
+		right = CubeTexture.BEDROCK
 	))
 
 }

@@ -28,7 +28,7 @@ class Game : ApplicationAdapter() {
 
     private fun setupGameCamera() {
         this.gameCamera = PerspectiveCamera(67f, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).apply {
-            position.set(00f, 0f, 10f)
+            position.set(-8f, -8f, 20f)
             lookAt(0f, 0f, 0f)
             near = 1f
             far = 300f

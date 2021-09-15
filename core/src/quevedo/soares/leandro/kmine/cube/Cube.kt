@@ -74,16 +74,22 @@ abstract class Cube {
 	)
 	// endregion
 
-	private var position: Vector3 = Vector3.Zero
+	var position: Vector3
 		set(value) {
 			field = value
 			this.modelInstance.transform.setTranslation(value)
 		}
 
-	abstract val textureMap: CubeFaceTextureMap
+	private val textureMap: CubeFaceTextureMap
 	private lateinit var texture: Texture
 	private lateinit var model: Model
 	val modelInstance by lazy { ModelInstance(this.model) }
+
+	constructor(position: Vector3, textureMap: CubeFaceTextureMap) {
+		this.textureMap = textureMap
+		this.createMesh()
+		this.position = position
+	}
 
 	fun dispose() {
 		this.model.dispose()
@@ -95,7 +101,7 @@ abstract class Cube {
 		this.rect(vertices[0], vertices[1], vertices[2], vertices[3], vertices[4], vertices[5], vertices[6], vertices[7], vertices[8], vertices[9], vertices[10], vertices[11], normals[0], normals[1], normals[2])
 	}
 
-	fun createMesh() {
+	private fun createMesh() {
 		val textureAtlas = TextureAtlas(Gdx.files.local("cubes.atlas"))
 		this.texture = textureAtlas.textures.first()
 

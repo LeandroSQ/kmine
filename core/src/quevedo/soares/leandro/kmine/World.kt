@@ -1,12 +1,12 @@
 package quevedo.soares.leandro.kmine
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import quevedo.soares.leandro.kmine.cube.Cube
-import quevedo.soares.leandro.kmine.cube.type.FurnaceCube
 
 class World {
 
@@ -14,7 +14,7 @@ class World {
 
     private lateinit var modelBatch: ModelBatch
 
-    private lateinit var cube: Cube
+    private lateinit var chunk: CubeChunk
 
     fun create() {
         this.setupModel()
@@ -31,25 +31,19 @@ class World {
     private fun setupModel() {
         this.modelBatch = ModelBatch()
 
-        this.cube = FurnaceCube().apply {
-            createMesh()
-        }
+        this.chunk = CubeChunk()
+        this.chunk.generate()
     }
 
     fun render(camera: Camera) {
         this.modelBatch.begin(camera)
-
-        Gdx.graphics.gL20.glEnable(GL20.GL_TEXTURE_2D)
-//        texture.bind()
-
-
-        this.modelBatch.render(this.cube.modelInstance, this.environment)
+        this.chunk.render(this.modelBatch, this.environment)
         this.modelBatch.end()
     }
 
     fun dispose() {
         this.modelBatch.dispose()
-        this.cube.dispose()
+        this.chunk.dispose()
     }
 
 }
