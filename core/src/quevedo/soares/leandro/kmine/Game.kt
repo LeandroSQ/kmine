@@ -51,6 +51,8 @@ class Game : ApplicationAdapter() {
     override fun render() {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
 
         this.cameraController.update()
 

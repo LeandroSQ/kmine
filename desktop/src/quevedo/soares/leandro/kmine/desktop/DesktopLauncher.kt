@@ -3,6 +3,7 @@ package quevedo.soares.leandro.kmine.desktop
 import kotlin.jvm.JvmStatic
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
+import com.badlogic.gdx.graphics.Color
 import quevedo.soares.leandro.kmine.Game
 
 object DesktopLauncher {
@@ -15,6 +16,7 @@ object DesktopLauncher {
             title = "KMine"
             x = -1
             y = -1
+            initialBackgroundColor = Color(60 / 255f, 174 / 255f, 243 / 255f, 1f)
             width = 800
             height = 400
             useHDPI = true
