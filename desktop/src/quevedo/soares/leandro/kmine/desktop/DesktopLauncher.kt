@@ -13,7 +13,7 @@ object DesktopLauncher {
             title = "KMine"
             width = 800
             height = 400
-            samples = 16
+            samples = 32
             resizable = false
             vSyncEnabled = true
             foregroundFPS = 0
