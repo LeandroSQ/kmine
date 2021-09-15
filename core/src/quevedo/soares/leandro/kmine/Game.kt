@@ -2,10 +2,13 @@ package quevedo.soares.leandro.kmine
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController
+import com.badlogic.gdx.math.Vector3
 
 val ANTIALIASING by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
@@ -36,6 +39,7 @@ class Game : ApplicationAdapter() {
         }
 
         this.cameraController = CameraInputController(this.gameCamera)
+//        this.cameraController = FirstPersonCameraController(this.gameCamera)
         Gdx.input.inputProcessor = this.cameraController
     }
 
@@ -54,11 +58,51 @@ class Game : ApplicationAdapter() {
         Gdx.gl.glEnable(GL20.GL_CULL_FACE)
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
 
+        //this.moveCamera()
         this.cameraController.update()
 
         this.world.render(this.gameCamera)
 
         this.renderHUD()
+    }
+
+
+
+    private fun moveCamera() {
+        val speed = 0.25f
+
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+            val direction = this.gameCamera.direction.cpy().crs(gameCamera.up).nor()
+            /*direction.y = 0f
+            direction.x *= speed
+            direction.z *= speed*/
+            this.gameCamera.translate(direction)
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+            val direction = this.gameCamera.direction.cpy().rotate(Vector3.Y, 90f)
+            direction.y = 0f
+            direction.x *= speed
+            direction.z *= speed
+            this.gameCamera.translate(direction)
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
+            val direction = this.gameCamera.direction.cpy()
+            direction.y *= speed
+            direction.x *= speed
+            direction.z *= speed
+            this.gameCamera.translate(direction)
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
+            val direction = this.gameCamera.direction.cpy()
+            direction.y *= -speed
+            direction.x *= -speed
+            direction.z *= -speed
+            this.gameCamera.translate(direction)
+        }
+
     }
 
     private fun renderHUD() {

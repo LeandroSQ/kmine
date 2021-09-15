@@ -31,13 +31,7 @@ class World {
     private fun setupModel() {
         this.modelBatch = ModelBatch()
 
-        // Generates the chunks
-        for(x in 0 until 5) {
-            for(z in 0 until 5) {
-                val chunk = TerrainBuilder.generateChunk(origin = Vector3(x.toFloat() * 16, 0f, z.toFloat() * 16))
-                this.chunks.add(chunk)
-            }
-        }
+       this.chunks = TerrainBuilder.generateWorld(3)
 
         // Generate the chunks meshes
         this.chunks.forEach { it.generateMesh() }

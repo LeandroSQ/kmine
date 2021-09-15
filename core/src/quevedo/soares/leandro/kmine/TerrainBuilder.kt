@@ -57,4 +57,17 @@ object TerrainBuilder {
 		return chunk
 	}
 
+	fun generateWorld(chunkCount: Int): ArrayList<Chunk> {
+		val chunks = arrayListOf<Chunk>()
+		// Generates the chunks
+		for(x in 0 until chunkCount) {
+			for(z in 0 until chunkCount) {
+				val chunk = generateChunk(origin = Vector3(x.toFloat() * 16, 0f, z.toFloat() * 16))
+				chunks.add(chunk)
+			}
+		}
+
+		return chunks
+	}
+
 }

@@ -10,7 +10,7 @@ object DesktopLauncher {
 
     @JvmStatic
     fun main(arg: Array<String>) {
-        System.setProperty("org.lwjgl.opengl.Display.allowSoftwareOpenGL", "true");
+        System.setProperty("org.lwjgl.opengl.Display.allowSoftwareOpenGL", "false");
 
         LwjglApplication(Game(), LwjglApplicationConfiguration().apply {
             title = "KMine"
@@ -21,7 +21,7 @@ object DesktopLauncher {
             height = 480
 //            useHDPI = true
             samples = 3
-            vSyncEnabled = true
+            vSyncEnabled = false
             foregroundFPS = 0
         })
     }
