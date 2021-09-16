@@ -26,4 +26,4 @@ But I ended up using OpenGL blending to achieve the effect
 
 Started experimenting with lighting as well, trying to make a day-night cycle
 And added the "torch cube" lol
-![Day 3 - 0](./github/day3_0.png)
+![Day 3 - 0](./.github/day3_0.png)
