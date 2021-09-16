@@ -1,3 +1,3 @@
-rootProject.name = "template"
+rootProject.name = "KMine"
 
-include(":core", ":android", ":desktop")
+include(":core", ":desktop")

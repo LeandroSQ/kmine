@@ -1,15 +1,19 @@
-# LibGDX Gradle Kotlin DSL template
-This is an template project for [libGDX](https://github.com/libgdx/libgdx)
-written in Kotlin and built with Gradle Kotlin DSL. Only desktop
-and android backends are available for now.
+# KMine
+A Minecraft clone made in Kotlin
 
-The gradle scripts created by the libGDX project creator use an
-outdated gradle version (4.6) and deprecated features (compile,
-classesDir, etc) This template aims to use only the most recent
-features.
+## Development process
+### Day 1
+First contact with LibGDX and LWJGL ever, struggled to display a cube sharing the same texture and material but mapping a specific UV region on each Cube's face
+![Day 1](./.github/day1_0.png)
 
-The template is supposed to work with IntelliJ out of the box but 
-it might require some adjustments for other IDEs like Eclipse.
+### Day 2
+Using the incredible [OpenSimplexNoise](https://gist.github.com/KdotJPG/b1270127455a94ac5d19) (The successor of Perlin noise) to generate a simple terrain
+With an even simpler chunk system... The chunks doesn't know its surroundings, therefore adding unnecessary faces on the draw calls
+![Day 2 - 0](./.github/day2_0.png)
 
-To use Java instead of Kotlin, replace all `kotlin("jvm")` plugin
-declarations with `java` and remove all kotlin-related dependencies.
+For the rest of the second day I fought with Gradle and IntelliJ, out of the blue the project stopped building
+The wonderful Kotlin-ready-template made by [maltaisn](https://github.com/maltaisn/kmine) helped to solve the issues
+And updated the libraries as well
+
+After all the fighting I changed the noise function to use the third dimension
+![Day 2 - 1](./.github/day2_1.png)

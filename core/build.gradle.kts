@@ -2,6 +2,8 @@ plugins {
     kotlin("jvm")
 }
 
+val assetsDir = file("./assets")
+
 dependencies {
     val gdxVersion: String by project
     val ktxVersion: String by project
@@ -10,6 +12,8 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-bullet:$gdxVersion")
 
     // LibKTX kotlin extensions, optional but recommended.
     // The complete list of modules is available at https://github.com/libktx/ktx
@@ -23,11 +27,16 @@ dependencies {
     // If you're using https://github.com/BlueBoxWare/LibGDXPlugin
     // this dependency provides the @GDXAssets annotation.
     compileOnly("com.gmail.blueboxware:libgdxpluginannotations:1.16")
-    
-    testImplementation("junit:junit:$junitVersion")
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_6
-    targetCompatibility = JavaVersion.VERSION_1_6
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks {
+    compileKotlin {
+        kotlinOptions { jvmTarget = "1.8" }
+        sourceCompatibility = "1.8"
+    }
 }
