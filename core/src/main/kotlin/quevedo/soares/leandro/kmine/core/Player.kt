@@ -135,4 +135,10 @@ class Player {
 
 	}
 
+	fun onResize(width: Float, height: Float) {
+		this.camera.viewportWidth = width
+		this.camera.viewportHeight = height
+		this.camera.update()
+	}
+
 }

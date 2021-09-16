@@ -45,4 +45,9 @@ class Game : ApplicationAdapter() {
         this.player.dispose()
     }
 
+    override fun resize(width: Int, height: Int) {
+        this.hud.onResize(width.toFloat(), height.toFloat())
+        this.player.onResize(width.toFloat(), height.toFloat())
+    }
+
 }

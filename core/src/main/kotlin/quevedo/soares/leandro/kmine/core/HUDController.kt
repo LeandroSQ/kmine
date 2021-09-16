@@ -5,11 +5,9 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g3d.Shader
-import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.math.vec2
-import quevedo.soares.leandro.kmine.core.shader.NegativeShader
+import quevedo.soares.leandro.kmine.core.shader.HUDShader
 import quevedo.soares.leandro.kmine.core.utils.use
 
 class HUDController {
@@ -18,6 +16,9 @@ class HUDController {
 	private lateinit var spriteBatch: SpriteBatch
 	private lateinit var camera: OrthographicCamera
 	private lateinit var shapeRenderer: ShapeRenderer
+
+	private val width get() = this.camera.viewportWidth
+	private val height get() = this.camera.viewportHeight
 
 	fun create() {
 		this.createFont()
@@ -45,7 +46,7 @@ class HUDController {
 	}
 
 	private fun createShapeRenderer() {
-		this.shapeRenderer = ShapeRenderer(64, NegativeShader.load()).apply {
+		this.shapeRenderer = ShapeRenderer(64, HUDShader.load()).apply {
 			color = Color.WHITE
 			projectionMatrix = camera.combined
 		}
@@ -53,9 +54,9 @@ class HUDController {
 
 	private fun renderCrosshair() {
 		val thickness = 5f
-		val size = 10f
-		val centerX = Gdx.graphics.width / 2f
-		val centerY = Gdx.graphics.height / 2f
+		val size = 12.5f
+		val centerX = width / 2f
+		val centerY = height / 2f
 
 		this.shapeRenderer.use {
 			// Horizontal line
@@ -82,17 +83,31 @@ class HUDController {
 		}
 	}
 
+	private fun renderFpsCounter() {
+		val padding = 5f
+		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", padding, height - padding)
+	}
+
 	fun render() {
 		this.spriteBatch.begin()
 		this.renderCrosshair()
-//		this.font.draw(this.spriteBatch, "+", Gdx.graphics.width / 2f, Gdx.graphics.height / 2f + this.font.lineHeight / 2f)
-		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", 0f, this.font.lineHeight)
+		this.renderFpsCounter()
 		this.spriteBatch.end()
 	}
 
 	fun dispose() {
 		this.font.dispose()
 		this.spriteBatch.dispose()
+	}
+
+	fun onResize(width: Float, height: Float) {
+		this.camera.viewportWidth = width
+		this.camera.viewportHeight = height
+		this.camera.position.set(width / 2f, height / 2f, 1f)
+		this.camera.update()
+
+		this.spriteBatch.projectionMatrix = this.camera.combined
+		this.shapeRenderer.projectionMatrix = this.camera.combined
 	}
 
 }
