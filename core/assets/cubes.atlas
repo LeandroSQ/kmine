@@ -1,99 +1,99 @@
 cubes.png
-	size: 257, 70
-	repeat: xy
+	size: 128, 128
+	repeat: none
 bedrock
-	bounds: 1, 2, 16, 16
+	bounds: 73, 109, 16, 16
 cactus_sides
-	bounds: 18, 2, 16, 16
-cactus_top
-	bounds: 35, 2, 16, 16
-coal_ore
-	bounds: 52, 2, 16, 16
-cobblestone
-	bounds: 69, 2, 16, 16
-crack1
-	bounds: 86, 2, 16, 16
-crack10
-	bounds: 103, 2, 16, 16
-crack2
-	bounds: 120, 2, 16, 16
-crack3
-	bounds: 137, 2, 16, 16
-crack4
-	bounds: 154, 2, 16, 16
-crack5
-	bounds: 171, 2, 16, 16
-crack6
-	bounds: 188, 2, 16, 16
-crack7
-	bounds: 205, 2, 16, 16
-crack8
-	bounds: 222, 2, 16, 16
-crack9
-	bounds: 239, 2, 16, 16
-diamond_ore
 	bounds: 1, 19, 16, 16
+cactus_top
+	bounds: 37, 19, 16, 16
+coal_ore
+	bounds: 55, 91, 16, 16
+cobblestone
+	bounds: 55, 55, 16, 16
+crack1
+	bounds: 55, 37, 16, 16
+crack10
+	bounds: 19, 37, 16, 16
+crack2
+	bounds: 37, 91, 16, 16
+crack3
+	bounds: 91, 37, 16, 16
+crack4
+	bounds: 91, 109, 16, 16
+crack5
+	bounds: 1, 73, 16, 16
+crack6
+	bounds: 55, 19, 16, 16
+crack7
+	bounds: 19, 55, 16, 16
+crack8
+	bounds: 91, 1, 16, 16
+crack9
+	bounds: 91, 91, 16, 16
+diamond_ore
+	bounds: 55, 1, 16, 16
 dirt
-	bounds: 18, 19, 16, 16
+	bounds: 109, 109, 16, 16
 furnace_front
-	bounds: 35, 19, 16, 16
+	bounds: 73, 55, 16, 16
 furnace_on_front
-	bounds: 52, 19, 16, 16
+	bounds: 73, 1, 16, 16
 furnace_sides
-	bounds: 69, 19, 16, 16
+	bounds: 73, 91, 16, 16
 furnace_top
-	bounds: 86, 19, 16, 16
+	bounds: 1, 109, 16, 16
 glass
-	bounds: 103, 19, 16, 16
+	bounds: 1, 37, 16, 16
 gold_ore
-	bounds: 120, 19, 16, 16
+	bounds: 19, 109, 16, 16
 grass_sides
-	bounds: 137, 19, 16, 16
+	bounds: 1, 55, 16, 16
 grass_top
-	bounds: 154, 19, 16, 16
+	bounds: 1, 1, 16, 16
 iron_ore
-	bounds: 171, 19, 16, 16
+	bounds: 91, 19, 16, 16
 lava
-	bounds: 188, 19, 16, 16
+	bounds: 73, 19, 16, 16
 leaves1
-	bounds: 205, 19, 16, 16
+	bounds: 1, 91, 16, 16
 leaves2
-	bounds: 222, 19, 16, 16
+	bounds: 109, 91, 16, 16
 leaves3
-	bounds: 239, 19, 16, 16
+	bounds: 55, 109, 16, 16
 leaves4
-	bounds: 1, 36, 16, 16
+	bounds: 109, 37, 16, 16
 log_sides
-	bounds: 18, 36, 16, 16
+	bounds: 37, 55, 16, 16
 log_top
-	bounds: 35, 36, 16, 16
+	bounds: 109, 55, 16, 16
 red_flower
-	bounds: 52, 36, 16, 16
+	bounds: 37, 1, 16, 16
 sand
-	bounds: 69, 36, 16, 16
+	bounds: 55, 73, 16, 16
 sapling
-	bounds: 86, 36, 16, 16
+	bounds: 37, 73, 16, 16
 stone
-	bounds: 103, 36, 16, 16
+	bounds: 19, 91, 16, 16
 tile059
-	bounds: 120, 36, 16, 16
+	bounds: 109, 19, 16, 16
 tile060
-	bounds: 137, 36, 16, 16
+	bounds: 73, 73, 16, 16
 tnt_bottom
-	bounds: 154, 36, 16, 16
+	bounds: 19, 19, 16, 16
 tnt_sides
-	bounds: 171, 36, 16, 16
+	bounds: 37, 37, 16, 16
 tnt_top
-	bounds: 188, 36, 16, 16
+	bounds: 19, 73, 16, 16
 torch
-	bounds: 205, 36, 16, 16
+	bounds: 37, 109, 16, 16
 water
-	bounds: 222, 36, 16, 16
+	bounds: 73, 37, 16, 16
 wooden_door_bottom
-	bounds: 239, 36, 16, 16
+	bounds: 19, 1, 16, 16
 wooden_door_top
-	bounds: 1, 53, 16, 16
+	bounds: 91, 73, 16, 16
 wooden_plank
-	bounds: 18, 53, 16, 16
+	bounds: 91, 55, 16, 16
 yellow_flower
-	bounds: 35, 53, 16, 16
+	bounds: 109, 73, 16, 16

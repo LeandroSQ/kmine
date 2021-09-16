@@ -11,10 +11,7 @@ val ANTIALIASING by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.
 
 class Game : ApplicationAdapter() {
 
-    private lateinit var font: BitmapFont
-    private lateinit var hudBatch: SpriteBatch
-    private lateinit var hudCamera: OrthographicCamera
-
+    private var hud = HUDController()
     private var world = World()
     private lateinit var player: Player
 
@@ -23,46 +20,29 @@ class Game : ApplicationAdapter() {
 
         this.player = Player()
         this.world.create()
-
-        this.setupHUD()
-    }
-
-
-    private fun setupHUD() {
-        this.hudCamera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).apply {
-            position.set(viewportWidth / 2f, viewportHeight / 2f, 1f)
-        }
-        this.font = BitmapFont(Gdx.files.local("default.fnt"))
-        this.font.color = Color.WHITE
-        this.hudBatch = SpriteBatch()
+        this.hud.create()
     }
 
     override fun render() {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT/* or ANTIALIASING*/)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
 //        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
 //        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
 //        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
 
         this.player.update()
+
         this.world.render(this.player.camera)
-
-        this.renderHUD()
-    }
-
-    private fun renderHUD() {
-        this.hudCamera.update()
-        this.hudBatch.projectionMatrix = this.hudCamera.combined
-        this.hudBatch.begin()
-        this.font.draw(this.hudBatch, "FPS: ${Gdx.graphics.framesPerSecond}", 0f, this.font.lineHeight)
-        this.hudBatch.end()
+        Gdx.gl20.glEnable(GL20.GL_BLEND)
+        Gdx.gl20.glBlendFunc(GL20.GL_ONE_MINUS_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
+        this.hud.render()
+        Gdx.gl20.glDisable(GL20.GL_BLEND)
     }
 
     override fun dispose() {
-        this.hudBatch.dispose()
+        this.hud.dispose()
         this.world.dispose()
         this.player.dispose()
-        this.font.dispose()
     }
 
 }

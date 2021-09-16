@@ -19,6 +19,8 @@ interface PhysicsEntity {
 	}
 }
 
+internal const val ENABLED = false
+
 class Physics {
 	private val objects = arrayListOf<PhysicsEntity>()
 
@@ -29,6 +31,8 @@ class Physics {
 	private lateinit var btSweep3: btAxisSweep3
 
 	fun init() {
+		if (!ENABLED) return
+
 		this.collisionConfig = btDefaultCollisionConfiguration()
 		this.dispatcher = btCollisionDispatcher(this.collisionConfig)
 		this.sequentialImpulseConstraintSolver = btSequentialImpulseConstraintSolver()
@@ -37,20 +41,28 @@ class Physics {
 	}
 
 	fun update() {
+		if (!ENABLED) return
+
 		world.stepSimulation(Gdx.graphics.deltaTime, 5)
 	}
 
 	fun addStaticEntity(entity: PhysicsEntity) {
+		if (!ENABLED) return
+
 		world.addRigidBody(entity.rigidBody, btBroadphaseProxy.CollisionFilterGroups.StaticFilter, btBroadphaseProxy.CollisionFilterGroups.CharacterFilter or btBroadphaseProxy.CollisionFilterGroups.DefaultFilter)
 		this.objects.add(entity)
 	}
 
 	fun addEntity(entity: PhysicsEntity) {
+		if (!ENABLED) return
+
 		world.addRigidBody(entity.rigidBody)
 		this.objects.add(entity)
 	}
 
 	fun dispose() {
+		if (!ENABLED) return
+
 		this.collisionConfig.dispose()
 		this.dispatcher.dispose()
 		this.btSweep3.dispose()

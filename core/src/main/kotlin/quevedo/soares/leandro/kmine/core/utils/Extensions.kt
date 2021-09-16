@@ -2,7 +2,26 @@ package quevedo.soares.leandro.kmine.core.utils
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder
+import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.enums.CubeTexture
+
+fun ShapeRenderer.use(shapeType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, callback: () -> Unit) {
+	this.begin(shapeType)
+	callback.invoke()
+	this.end()
+}
+
+fun vec2(x: Int = 0, y: Int = 0) = Vector2(x.toFloat(), y.toFloat())
+inline val Vector2.xInt get() = this.x.toInt()
+inline val Vector2.yInt get() = this.y.toInt()
+
+fun vec3(x: Int = 0, y: Int = 0, z: Int = 0) = Vector3(x.toFloat(), y.toFloat(), z.toFloat())
+inline val Vector3.xInt get() = this.x.toInt()
+inline val Vector3.yInt get() = this.y.toInt()
+inline val Vector3.zInt get() = this.z.toInt()
 
 fun FloatArray.add(other: FloatArray): FloatArray {
 	this.clone().apply {

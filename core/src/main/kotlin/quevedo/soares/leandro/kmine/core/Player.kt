@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback
+import ktx.math.plus
+import ktx.math.times
 
 private const val FOV = 67f
 private const val SPEED = 8.25f
@@ -45,25 +47,26 @@ class Player {
 	}
 
 	private fun handleMouseInput() {
+		val sensitivity = 0.8f
 		val mouseX = -Gdx.input.getDeltaX(0)
 		val mouseY = -Gdx.input.getDeltaY(0)
 
 		if (mouseX != 0) {
-			this.camera.direction.rotate(camera.up, mouseX * 1.25f)
+			this.camera.direction.rotate(camera.up, mouseX * sensitivity)
 			isCameraDirty = true
 		}
 
 		if (mouseY != 0) {
 			val currentAngle = this.camera.direction.y
-			if (!(currentAngle < -0.98 && mouseY < 0) && !(currentAngle > 0.98 && mouseY > 0)) {
-				this.camera.direction.rotate(camera.direction.cpy().crs(camera.up).nor(), mouseY * 1.25f)
+			if (!(currentAngle < -0.98f && mouseY < 0) && !(currentAngle > 0.98f && mouseY > 0)) {
+				this.camera.direction.rotate(camera.direction.cpy().crs(camera.up).nor(), mouseY * sensitivity)
 				isCameraDirty = true
 			}
 		}
 
 		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
 			val origin = this.camera.position.cpy()
-			val target = origin.add(this.camera.direction.cpy().scl(50f))
+			val target = origin + (this.camera.direction.cpy() * 50f)
 
 			val callback = ClosestRayResultCallback(origin, target)
 			callback.collisionObject = null
@@ -90,27 +93,27 @@ class Player {
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			translateCamera(this.camera.direction.cpy().crs(camera.up).nor().scl(-speed))
+			translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * -speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			translateCamera(this.camera.direction.cpy().crs(camera.up).nor().scl(speed))
+			translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
-			translateCamera(this.camera.direction.cpy().scl(speed))
+			translateCamera(this.camera.direction.cpy() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
-			translateCamera(this.camera.direction.cpy().scl(-speed))
+			translateCamera(this.camera.direction.cpy() * -speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-			translateCamera(this.camera.up.cpy().scl(speed))
+			translateCamera(this.camera.up.cpy() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
-			translateCamera(this.camera.up.cpy().scl(-speed))
+			translateCamera(this.camera.up.cpy() * -speed)
 		}
 	}
 
@@ -122,14 +125,14 @@ class Player {
 			this.handleInputCapture()
 		}
 
-		if(isCameraDirty) {
+		if (isCameraDirty) {
 			this.camera.update()
 			isCameraDirty = false
 		}
 	}
-	
+
 	fun dispose() {
-		
+
 	}
 
 }

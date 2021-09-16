@@ -3,6 +3,7 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
@@ -11,11 +12,13 @@ import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
+import ktx.math.minus
+import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.PhysicsEntity
-import quevedo.soares.leandro.kmine.core.utils.addQuad
+import quevedo.soares.leandro.kmine.core.utils.*
 
 @Suppress("NOTHING_TO_INLINE")
-class Chunk: PhysicsEntity {
+class Chunk : PhysicsEntity {
 
 	private lateinit var model: Model
 	private lateinit var modelInstance: ModelInstance
@@ -53,20 +56,23 @@ class Chunk: PhysicsEntity {
 		this.cubes = xBuffer
 	}
 
-	fun getCubeAt(x: Int, y: Int, z: Int): Cube? {
-		if (x >= this.xCount || y >= this.yCount || z >= this.zCount || x < 0 || y < 0 || z < 0 ) return null
-		return cubes[x][y][z]
+	fun getCubeAt(position: Vector3): Cube? {
+		if (position.xInt >= this.xCount || position.yInt >= this.yCount || position.zInt >= this.zCount || position.xInt < 0 || position.yInt < 0 || position.zInt < 0) return null
+		return cubes[position.xInt][position.yInt][position.zInt]
 	}
 
-	fun setCubeAt(x: Int, y: Int, z: Int, cube: Cube?) {
-		cube?.position = Vector3(x.toFloat(), y.toFloat(), z.toFloat())
-		this.cubes[x][y][z] = cube
+	fun setCubeAt(position: Vector3, cube: Cube?) {
+		cube?.position = position
+		this.cubes[position.x.toInt()][position.y.toInt()][position.z.toInt()] = cube
 	}
 
-	inline fun isCubeEmptyAt(x: Int, y: Int, z: Int) = this.getCubeAt(x, y, z) == null
+	fun absolutePosition(relativePosition: Vector3) = relativePosition + this.origin
+	fun relativePosition(absolutePosition: Vector3) = absolutePosition - this.origin
+
+	inline fun isCubeEmptyAt(x: Int, y: Int, z: Int) = this.getCubeAt(vec3(x, y, z)) == null
 
 	fun getHighestCubeAt(x: Int, z: Int): Cube? {
-		for(y in 1 until this.cubes[x].size) {
+		for (y in 1 until this.cubes[x].size) {
 			val cube = this.cubes[x][this.cubes[x].size - y][z]
 			if (cube != null) return cube
 		}
@@ -75,10 +81,10 @@ class Chunk: PhysicsEntity {
 	}
 
 	fun generateMesh() {
-		val material = Material(TextureAttribute.createDiffuse(Cube.texture))
+		val material = Material(TextureAttribute.createDiffuse(Cube.texture), BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA))
 		val attributes = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.TextureCoordinates).toLong()
 
-        // if (this.model::isInitialized) this.model.dispose()
+		// if (this.model::isInitialized) this.model.dispose()
 		this.model = ModelBuilder().run {
 			begin()
 
@@ -116,8 +122,8 @@ class Chunk: PhysicsEntity {
 		this.modelInstance = ModelInstance(this.model)
 		this.modelInstance.transform.setTranslation(this.origin)
 
-		if (this.collisionObject != null || this.rigidBody != null) this.disposeCollisionObject()
-		generateCollisionObject()
+		//if (this.collisionObject != null || this.rigidBody != null) this.disposeCollisionObject()
+		//generateCollisionObject()
 	}
 
 	private fun generateCollisionObject() {

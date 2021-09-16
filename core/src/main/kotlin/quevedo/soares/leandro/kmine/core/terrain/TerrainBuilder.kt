@@ -3,7 +3,9 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.terrain.type.BedrockCube
 import quevedo.soares.leandro.kmine.core.terrain.type.DirtCube
+import quevedo.soares.leandro.kmine.core.terrain.type.GrassCube
 import quevedo.soares.leandro.kmine.core.utils.OpenSimplexNoise
+import quevedo.soares.leandro.kmine.core.utils.vec3
 
 object TerrainBuilder {
 
@@ -14,7 +16,7 @@ object TerrainBuilder {
 	}
 
 	private fun noise(x: Double, y: Double, z: Double? = null, min: Float = 0f, max: Float = 1f): Double {
-		val noise = if (z != null) simplexNoise.noise3_Classic(x, y, z)
+		val noise = if (z != null) simplexNoise.noise3_XZBeforeY(x, y, z)
 		else simplexNoise.noise2(x, y)
 
 		return map(noise.toFloat(), -1f, 1f, min, max).toDouble()
@@ -34,29 +36,25 @@ object TerrainBuilder {
 		for (x in 0 until chunk.cubes.size) {
 			for (y in 0 until chunk.cubes[x].size) {
 				for (z in 0 until chunk.cubes[x][y].size) {
+					val pos = vec3(x, y, z)
+
 					if (y <= 0) {
-						chunk.setCubeAt(x, y, z, BedrockCube())
+						chunk.setCubeAt(pos, BedrockCube())
 						continue
 					}
 
 					val noise = noise(
 						x = (x + origin.x) / chunkSize.toDouble(),
-						y = (y + origin.y) / chunkAltitude.toDouble(),
-						z = (z + origin.z) / chunkSize.toDouble(),
-						min = 0f,
-						max = 1f
+						y = (z + origin.z) / chunkSize.toDouble(),
+						min = chunkAltitude.toFloat() / 3,
+						max = chunkAltitude.toFloat() / 2
 					)
 
-					if (noise > 0.5) {
-						chunk.setCubeAt(x, y, z, DirtCube())
-					}
-
-					// println("$x, $y, $z -> $noise")
-					/*if (y + 1 < noise) {
-						chunk.setCubeAt(x, y, z, DirtCube())
+					if (y + 1 < noise) {
+						chunk.setCubeAt(pos, DirtCube())
 					} else if (y < noise) {
-						chunk.setCubeAt(x, y, z, GrassCube())
-					}*/
+						chunk.setCubeAt(pos, GrassCube())
+					}
 				}
 			}
 		}
