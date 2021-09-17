@@ -7,7 +7,6 @@ val assetsDir = file("./assets")
 dependencies {
     val gdxVersion: String by project
     val ktxVersion: String by project
-    val junitVersion: String by project
 
     implementation(kotlin("stdlib"))
 
@@ -39,4 +38,8 @@ tasks {
         kotlinOptions { jvmTarget = "1.8" }
         sourceCompatibility = "1.8"
     }
+}
+
+sourceSets.getByName("main") {
+    java.srcDir("src/main/kotlin")
 }

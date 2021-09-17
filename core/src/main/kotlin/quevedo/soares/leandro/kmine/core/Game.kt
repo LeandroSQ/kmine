@@ -37,7 +37,7 @@ class Game : ApplicationAdapter() {
         this.world.render(this.player.camera)
         Gdx.gl20.glEnable(GL20.GL_BLEND)
         Gdx.gl20.glBlendFunc(GL20.GL_ONE_MINUS_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
-        this.hud.render()
+        this.hud.render(this.world)
         Gdx.gl20.glDisable(GL20.GL_BLEND)
     }
 

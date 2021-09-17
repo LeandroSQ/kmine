@@ -57,3 +57,7 @@ After a little bit of tweaking..
 Also added a different font .ttf to the HUD
 Added support for varying display density
 And smoother camera movement
+
+### Day 4
+To start, I just wanna share a video on how to project is going so far.
+![Day 4 - 0](./github/day4_0.mp4)

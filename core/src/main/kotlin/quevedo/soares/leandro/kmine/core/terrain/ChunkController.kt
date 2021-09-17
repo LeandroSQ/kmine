@@ -8,12 +8,12 @@ class ChunkController {
 	val chunkAltitude = 32
 	val chunks = arrayListOf<ArrayList<Chunk>>()
 
-	fun getChunkAt(x: Int, y: Int, z: Int): Chunk? {
+	fun getChunkAt(x: Int,  z: Int): Chunk? {
 		val nx = x % chunkSize
-		val ny = y % chunkSize
+		val nz = z % chunkSize
 
-		return if (nx > this.chunks.size || ny > this.chunks[nx].size) null
-		else this.chunks[nx][ny]
+		return if (nx > this.chunks.size || nz > this.chunks[nx].size) null
+		else this.chunks[nx][nz]
 	}
 
 	fun generateInitialChunks(amount: Int) {

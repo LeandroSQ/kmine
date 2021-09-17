@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -15,6 +16,7 @@ import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import ktx.math.minus
 import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.PhysicsEntity
+import quevedo.soares.leandro.kmine.core.enums.CubeTexture
 import quevedo.soares.leandro.kmine.core.utils.*
 
 @Suppress("NOTHING_TO_INLINE")
@@ -22,6 +24,12 @@ class Chunk : PhysicsEntity {
 
 	private lateinit var model: Model
 	private lateinit var modelInstance: ModelInstance
+
+	var verticesCount: Int = 0
+		private set
+
+	var indicesCount: Int = 0
+		private set
 
 	var cubes: ArrayList<ArrayList<ArrayList<Cube?>>> = arrayListOf()
 
@@ -71,7 +79,7 @@ class Chunk : PhysicsEntity {
 
 	private inline fun isCubeEmptyAt(x: Int, y: Int, z: Int): Boolean {
 		val cube = this.getCubeAt(vec3(x, y, z))
-		return cube == null || cube?.isTranslucent
+		return cube == null || cube.isTranslucent
 	}
 
 	fun getHighestCubeAt(x: Int, z: Int): Cube? {
@@ -113,7 +121,6 @@ class Chunk : PhysicsEntity {
 							if (isCubeEmptyAt(x, y, z + 1)) addQuad(cube.frontFace, cube.frontNormal, offset, Cube.atlas, cube.textureMap.front)
 							// Back
 							if (isCubeEmptyAt(x, y, z - 1)) addQuad(cube.backFace, cube.backNormal, offset, Cube.atlas, cube.textureMap.back)
-
 						}
 					}
 				}
@@ -121,6 +128,9 @@ class Chunk : PhysicsEntity {
 
 			end()
 		}
+
+		this.verticesCount = this.model.meshParts.sumOf { it.mesh.numVertices }
+		this.indicesCount = this.model.meshParts.sumOf { it.mesh.numIndices }
 
 		this.modelInstance = ModelInstance(this.model)
 		this.modelInstance.transform.setTranslation(this.origin)

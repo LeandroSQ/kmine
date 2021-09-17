@@ -36,6 +36,9 @@ class World {
 	var chunks = arrayListOf<Chunk>()
 	var entities = arrayListOf<FallingCube>()
 
+	val verticesCount get()  = this.chunks.sumOf { it.verticesCount }
+	val indicesCount get()  = this.chunks.sumOf { it.indicesCount }
+
 	fun create() {
 		this.physics = Physics()
 		this.physics.init()

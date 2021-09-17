@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.math.vec2
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
@@ -33,7 +32,7 @@ class HUDController {
 	}
 
 	private fun createFont() {
-		val generator = FreeTypeFontGenerator(Gdx.files.local("font.ttf"))
+		val generator = FreeTypeFontGenerator(Gdx.files.local("default.otf"))
 		val parameters = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
 			magFilter = Texture.TextureFilter.Nearest
 			minFilter = Texture.TextureFilter.Nearest
@@ -103,10 +102,17 @@ class HUDController {
 		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", padding, height - padding)
 	}
 
-	fun render() {
+	private fun renderStatistics(world: World) {
+		val padding = 10f
+		this.font.draw(this.spriteBatch, "Vertices: ${world.verticesCount}", padding, height - padding - font.lineHeight)
+		this.font.draw(this.spriteBatch, "Indices: ${world.indicesCount}", padding, height - padding - font.lineHeight * 2)
+	}
+
+	fun render(world: World) {
 		this.spriteBatch.begin()
 		this.renderCrosshair()
 		this.renderFpsCounter()
+		this.renderStatistics(world)
 		this.spriteBatch.end()
 	}
 
