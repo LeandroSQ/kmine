@@ -69,7 +69,10 @@ class Chunk : PhysicsEntity {
 	fun absolutePosition(relativePosition: Vector3) = relativePosition + this.origin
 	fun relativePosition(absolutePosition: Vector3) = absolutePosition - this.origin
 
-	inline fun isCubeEmptyAt(x: Int, y: Int, z: Int) = this.getCubeAt(vec3(x, y, z)) == null
+	private inline fun isCubeEmptyAt(x: Int, y: Int, z: Int): Boolean {
+		val cube = this.getCubeAt(vec3(x, y, z))
+		return cube == null || cube?.isTranslucent
+	}
 
 	fun getHighestCubeAt(x: Int, z: Int): Cube? {
 		for (y in 1 until this.cubes[x].size) {
@@ -99,17 +102,17 @@ class Chunk : PhysicsEntity {
 							val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
 							// Top
-							if (isCubeEmptyAt(x, y + 1, z)) addQuad(Cube.topFace, Cube.topNormal, offset, Cube.atlas, cube.textureMap.top)
+							if (isCubeEmptyAt(x, y + 1, z)) addQuad(cube.topFace, cube.topNormal, offset, Cube.atlas, cube.textureMap.top)
 							// Bottom
-							if (isCubeEmptyAt(x, y - 1, z)) addQuad(Cube.bottomFace, Cube.bottomNormal, offset, Cube.atlas, cube.textureMap.bottom)
+							if (isCubeEmptyAt(x, y - 1, z)) addQuad(cube.bottomFace, cube.bottomNormal, offset, Cube.atlas, cube.textureMap.bottom)
 							// Left
-							if (isCubeEmptyAt(x - 1, y, z)) addQuad(Cube.leftFace, Cube.leftNormal, offset, Cube.atlas, cube.textureMap.left)
+							if (isCubeEmptyAt(x - 1, y, z)) addQuad(cube.leftFace, cube.leftNormal, offset, Cube.atlas, cube.textureMap.left)
 							// Right
-							if (isCubeEmptyAt(x + 1, y, z)) addQuad(Cube.rightFace, Cube.rightNormal, offset, Cube.atlas, cube.textureMap.right)
+							if (isCubeEmptyAt(x + 1, y, z)) addQuad(cube.rightFace, cube.rightNormal, offset, Cube.atlas, cube.textureMap.right)
 							// Front
-							if (isCubeEmptyAt(x, y, z + 1)) addQuad(Cube.frontFace, Cube.frontNormal, offset, Cube.atlas, cube.textureMap.front)
+							if (isCubeEmptyAt(x, y, z + 1)) addQuad(cube.frontFace, cube.frontNormal, offset, Cube.atlas, cube.textureMap.front)
 							// Back
-							if (isCubeEmptyAt(x, y, z - 1)) addQuad(Cube.backFace, Cube.backNormal, offset, Cube.atlas, cube.textureMap.back)
+							if (isCubeEmptyAt(x, y, z - 1)) addQuad(cube.backFace, cube.backNormal, offset, Cube.atlas, cube.textureMap.back)
 
 						}
 					}

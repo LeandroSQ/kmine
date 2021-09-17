@@ -11,4 +11,5 @@ data class CubeFaceTextureMap (
 	val bottom: CubeTexture
 ) {
 	constructor(singleTexture: CubeTexture) : this(singleTexture, singleTexture, singleTexture, singleTexture, singleTexture, singleTexture)
+	constructor(top: CubeTexture, bottom: CubeTexture, sides: CubeTexture) : this(top, sides, sides, sides, sides, bottom)
 }

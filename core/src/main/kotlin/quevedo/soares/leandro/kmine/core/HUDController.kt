@@ -3,12 +3,17 @@ package quevedo.soares.leandro.kmine.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.math.vec2
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
 import quevedo.soares.leandro.kmine.core.utils.use
+
+private val FONT_SIZE = 46f * Gdx.graphics.density
 
 class HUDController {
 
@@ -28,8 +33,18 @@ class HUDController {
 	}
 
 	private fun createFont() {
-		this.font = BitmapFont(Gdx.files.local("default.fnt"))
-		this.font.color = Color.WHITE
+		val generator = FreeTypeFontGenerator(Gdx.files.local("font.ttf"))
+		val parameters = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
+			magFilter = Texture.TextureFilter.Nearest
+			minFilter = Texture.TextureFilter.Nearest
+			color = Color.WHITE
+			size = FONT_SIZE.toInt()
+			shadowOffsetX = 1
+			shadowOffsetY = 1
+		}
+
+		this.font = generator.generateFont(parameters)
+		generator.dispose()
 	}
 
 	private fun createCamera() {
@@ -84,7 +99,7 @@ class HUDController {
 	}
 
 	private fun renderFpsCounter() {
-		val padding = 5f
+		val padding = 10f
 		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", padding, height - padding)
 	}
 

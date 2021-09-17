@@ -1,99 +1,342 @@
+
 cubes.png
-	size: 128, 128
-	repeat: none
+size: 128, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: xy
 bedrock
-	bounds: 73, 109, 16, 16
+  rotate: false
+  xy: 55, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 cactus_sides
-	bounds: 1, 19, 16, 16
+  rotate: false
+  xy: 73, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 cactus_top
-	bounds: 37, 19, 16, 16
+  rotate: false
+  xy: 19, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 coal_ore
-	bounds: 55, 91, 16, 16
+  rotate: false
+  xy: 37, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 cobblestone
-	bounds: 55, 55, 16, 16
+  rotate: false
+  xy: 37, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack1
-	bounds: 55, 37, 16, 16
-crack10
-	bounds: 19, 37, 16, 16
+  rotate: false
+  xy: 37, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack2
-	bounds: 37, 91, 16, 16
+  rotate: false
+  xy: 19, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack3
-	bounds: 91, 37, 16, 16
+  rotate: false
+  xy: 55, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack4
-	bounds: 91, 109, 16, 16
+  rotate: false
+  xy: 73, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack5
-	bounds: 1, 73, 16, 16
+  rotate: false
+  xy: 1, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack6
-	bounds: 55, 19, 16, 16
+  rotate: false
+  xy: 37, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack7
-	bounds: 19, 55, 16, 16
+  rotate: false
+  xy: 1, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack8
-	bounds: 91, 1, 16, 16
+  rotate: false
+  xy: 91, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 crack9
-	bounds: 91, 91, 16, 16
+  rotate: false
+  xy: 73, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 diamond_ore
-	bounds: 55, 1, 16, 16
+  rotate: false
+  xy: 91, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 dirt
-	bounds: 109, 109, 16, 16
+  rotate: false
+  xy: 91, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 furnace_front
-	bounds: 73, 55, 16, 16
+  rotate: false
+  xy: 55, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 furnace_on_front
-	bounds: 73, 1, 16, 16
+  rotate: false
+  xy: 91, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 furnace_sides
-	bounds: 73, 91, 16, 16
+  rotate: false
+  xy: 55, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 furnace_top
-	bounds: 1, 109, 16, 16
+  rotate: false
+  xy: 1, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 glass
-	bounds: 1, 37, 16, 16
+  rotate: false
+  xy: 55, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 gold_ore
-	bounds: 19, 109, 16, 16
+  rotate: false
+  xy: 19, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 grass_sides
-	bounds: 1, 55, 16, 16
+  rotate: false
+  xy: 37, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 grass_top
-	bounds: 1, 1, 16, 16
+  rotate: false
+  xy: 91, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 iron_ore
-	bounds: 91, 19, 16, 16
+  rotate: false
+  xy: 109, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 lava
-	bounds: 73, 19, 16, 16
+  rotate: false
+  xy: 109, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 leaves1
-	bounds: 1, 91, 16, 16
+  rotate: false
+  xy: 1, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 leaves2
-	bounds: 109, 91, 16, 16
+  rotate: false
+  xy: 91, 73
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 leaves3
-	bounds: 55, 109, 16, 16
+  rotate: false
+  xy: 37, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 leaves4
-	bounds: 109, 37, 16, 16
+  rotate: false
+  xy: 73, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 log_sides
-	bounds: 37, 55, 16, 16
+  rotate: false
+  xy: 19, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 log_top
-	bounds: 109, 55, 16, 16
+  rotate: false
+  xy: 73, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 red_flower
-	bounds: 37, 1, 16, 16
+  rotate: false
+  xy: 109, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 sand
-	bounds: 55, 73, 16, 16
+  rotate: false
+  xy: 1, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 sapling
-	bounds: 37, 73, 16, 16
+  rotate: false
+  xy: 19, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 stone
-	bounds: 19, 91, 16, 16
+  rotate: false
+  xy: 19, 91
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 tile059
-	bounds: 109, 19, 16, 16
+  rotate: false
+  xy: 109, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 tile060
-	bounds: 73, 73, 16, 16
+  rotate: false
+  xy: 55, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 tnt_bottom
-	bounds: 19, 19, 16, 16
+  rotate: false
+  xy: 37, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 tnt_sides
-	bounds: 37, 37, 16, 16
+  rotate: false
+  xy: 1, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 tnt_top
-	bounds: 19, 73, 16, 16
+  rotate: false
+  xy: 1, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 torch
-	bounds: 37, 109, 16, 16
+  rotate: false
+  xy: 91, 7
+  size: 2, 10
+  orig: 2, 10
+  offset: 0, 0
+  index: -1
+torch_top
+  rotate: false
+  xy: 109, 33
+  size: 2, 2
+  orig: 2, 2
+  offset: 0, 0
+  index: -1
 water
-	bounds: 73, 37, 16, 16
+  rotate: false
+  xy: 55, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 wooden_door_bottom
-	bounds: 19, 1, 16, 16
+  rotate: false
+  xy: 109, 109
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 wooden_door_top
-	bounds: 91, 73, 16, 16
+  rotate: false
+  xy: 73, 55
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 wooden_plank
-	bounds: 91, 55, 16, 16
+  rotate: false
+  xy: 73, 37
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
 yellow_flower
-	bounds: 109, 73, 16, 16
+  rotate: false
+  xy: 19, 19
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1

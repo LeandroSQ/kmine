@@ -44,6 +44,7 @@ enum class CubeTexture(val regionName: String) {
 	TNT_SIDES("tnt_sides"),
 	TNT_TOP("tnt_top"),
 	TORCH("torch"),
+	TORCH_TOP("torch_top"),
 	WATER("water"),
 	WOODEN_DOOR_BOTTOM("wooden_door_bottom"),
 	WOODEN_DOOR_TOP("wooden_door_top"),

@@ -4,12 +4,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback
-import ktx.math.plus
 import ktx.math.times
+import ktx.math.vec3
 
 private const val FOV = 67f
 private const val SPEED = 8.25f
+private const val MOUSE_SENSITIVITY = 64f
+private const val MAX_CAMERA_PITCH = 0.987f
 
 class Player {
 
@@ -18,15 +19,15 @@ class Player {
 
 	private var isCapturingInput = true
 
-	init {
-		Gdx.input.isCursorCatched = true
-	}
-
-	val camera: PerspectiveCamera = PerspectiveCamera(FOV, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).apply {
+	val camera: PerspectiveCamera = PerspectiveCamera(FOV, Gdx.graphics.width * Gdx.graphics.density, Gdx.graphics.height * Gdx.graphics.density).apply {
 		position.set(this@Player.position)
 		near = 1f
 		far = 300f
 		update()
+	}
+
+	init {
+		Gdx.input.isCursorCatched = true
 	}
 
 	private fun translateCamera(direction: Vector3) {
@@ -47,7 +48,7 @@ class Player {
 	}
 
 	private fun handleMouseInput() {
-		val sensitivity = 0.8f
+		val sensitivity = MOUSE_SENSITIVITY * Gdx.graphics.deltaTime
 		val mouseX = -Gdx.input.getDeltaX(0)
 		val mouseY = -Gdx.input.getDeltaY(0)
 
@@ -58,20 +59,21 @@ class Player {
 
 		if (mouseY != 0) {
 			val currentAngle = this.camera.direction.y
-			if (!(currentAngle < -0.98f && mouseY < 0) && !(currentAngle > 0.98f && mouseY > 0)) {
-				this.camera.direction.rotate(camera.direction.cpy().crs(camera.up).nor(), mouseY * sensitivity)
+			if (!(currentAngle < -MAX_CAMERA_PITCH && mouseY < 0) && !(currentAngle > MAX_CAMERA_PITCH && mouseY > 0)) {
+				this.camera.direction.rotate(this.camera.direction.cpy().crs(camera.up).nor(), mouseY * sensitivity)
 				isCameraDirty = true
 			}
 		}
 
-		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+		// TODO: Cube ray casting
+		/*if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
 			val origin = this.camera.position.cpy()
 			val target = origin + (this.camera.direction.cpy() * 50f)
 
 			val callback = ClosestRayResultCallback(origin, target)
 			callback.collisionObject = null
 			callback.closestHitFraction = 1f
-		}
+		}*/
 	}
 
 	private fun handleKeyInput() {
@@ -117,9 +119,22 @@ class Player {
 		}
 	}
 
+	private fun lerp(a: Vector3, b: Vector3, step: Float): Vector3 {
+		fun f(current: Float, target: Float): Float {
+			val distance = target - current
+
+			val x = current + if (distance > step) step else if (distance < -step) -step else distance
+			if (x > 1f) println(x)
+			return x
+		}
+
+		return vec3(f(a.x, b.x), f(a.y, b.y), f(a.z, b.z))
+	}
+
 	fun update() {
 		if (this.isCapturingInput) {
 			this.handleMouseInput()
+
 			this.handleKeyInput()
 		} else {
 			this.handleInputCapture()

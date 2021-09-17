@@ -2,10 +2,12 @@ package quevedo.soares.leandro.kmine.core
 
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.*
-import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.physics.bullet.Bullet
+import java.awt.Image
+import javax.swing.ImageIcon
+
 
 val ANTIALIASING by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
@@ -24,7 +26,7 @@ class Game : ApplicationAdapter() {
     }
 
     override fun render() {
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+        HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
 //        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
 //        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
@@ -46,8 +48,11 @@ class Game : ApplicationAdapter() {
     }
 
     override fun resize(width: Int, height: Int) {
-        this.hud.onResize(width.toFloat(), height.toFloat())
-        this.player.onResize(width.toFloat(), height.toFloat())
+        val w = HdpiUtils.toBackBufferX(width).toFloat()
+        val h = HdpiUtils.toBackBufferY(height).toFloat()
+
+        this.hud.onResize(w, h)
+        this.player.onResize(w, h)
     }
 
 }

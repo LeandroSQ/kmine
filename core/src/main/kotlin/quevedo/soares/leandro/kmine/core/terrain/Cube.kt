@@ -12,68 +12,87 @@ abstract class Cube {
 	open lateinit var textureMap: CubeFaceTextureMap
 	open var isTranslucent: Boolean = false
 
-	constructor() { }
+	constructor() {}
 	constructor(position: Vector3) {
 		this.position = position
 	}
 
+	open val frontNormal get() = Cube.frontNormal
+	open val frontFace get() = Cube.frontFace
+
+	open val backNormal get() = Cube.backNormal
+	open val backFace get() = Cube.backFace
+
+	open val topNormal get() = Cube.topNormal
+	open val topFace get() = Cube.topFace
+
+	open val leftNormal get() = Cube.leftNormal
+	open val leftFace get() = Cube.leftFace
+
+	open val rightNormal get() = Cube.rightNormal
+	open val rightFace get() = Cube.rightFace
+
+	open val bottomNormal get() = Cube.bottomNormal
+	open val bottomFace get() = Cube.bottomFace
+
 	companion object {
+
 		// region Normals
-		val frontNormal = floatArrayOf(0f, 0f, 1f)
+		private val frontNormal = floatArrayOf(0f, 0f, 1f)
 
-		val backNormal = floatArrayOf(0f, 0f, -1f)
+		private val backNormal = floatArrayOf(0f, 0f, -1f)
 
-		val topNormal = floatArrayOf(0f, 1f, 0f)
+		private val topNormal = floatArrayOf(0f, 1f, 0f)
 
-		val bottomNormal = floatArrayOf(0f, -1f, 0f)
+		private val bottomNormal = floatArrayOf(0f, -1f, 0f)
 
-		val leftNormal = floatArrayOf(-1f, 0f, 0f)
+		private val leftNormal = floatArrayOf(-1f, 0f, 0f)
 
-		val rightNormal = floatArrayOf(1f, 0f, 0f)
+		private val rightNormal = floatArrayOf(1f, 0f, 0f)
 		// endregion
 
 		// region Faces
-		val frontFace = floatArrayOf(
-			-0.5f, -0.5f,  0.5f,
-			0.5f,  -0.5f,  0.5f,
-			0.5f,   0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f
+		private val frontFace = floatArrayOf(
+			-0.5f, -0.5f, 0.5f,
+			0.5f, -0.5f, 0.5f,
+			0.5f, 0.5f, 0.5f,
+			-0.5f, 0.5f, 0.5f
 		)
 
-		val backFace = floatArrayOf(
+		private val backFace = floatArrayOf(
 			// x   y    z
 			0.5f, -0.5f, -0.5f,
 			-0.5f, -0.5f, -0.5f,
-			-0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f
+			-0.5f, 0.5f, -0.5f,
+			0.5f, 0.5f, -0.5f
 		)
 
-		val topFace = floatArrayOf(
-			-0.5f,  0.5f, -0.5f,
-			-0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f,  0.5f,
-			0.5f,  0.5f, -0.5f
+		private val topFace = floatArrayOf(
+			-0.5f, 0.5f, -0.5f,
+			-0.5f, 0.5f, 0.5f,
+			0.5f, 0.5f, 0.5f,
+			0.5f, 0.5f, -0.5f
 		)
 
-		val bottomFace = floatArrayOf(
+		private val bottomFace = floatArrayOf(
 			-0.5f, -0.5f, -0.5f,
-			0.5f,  -0.5f, -0.5f,
-			0.5f,  -0.5f,  0.5f,
-			-0.5f, -0.5f,  0.5f
-		)
-
-		val rightFace = floatArrayOf(
-			0.5f, -0.5f,  0.5f,
 			0.5f, -0.5f, -0.5f,
-			0.5f,  0.5f, -0.5f,
-			0.5f,  0.5f,  0.5f
+			0.5f, -0.5f, 0.5f,
+			-0.5f, -0.5f, 0.5f
 		)
 
-		val leftFace = floatArrayOf(
+		private val rightFace = floatArrayOf(
+			0.5f, -0.5f, 0.5f,
+			0.5f, -0.5f, -0.5f,
+			0.5f, 0.5f, -0.5f,
+			0.5f, 0.5f, 0.5f
+		)
+
+		private val leftFace = floatArrayOf(
 			-0.5f, -0.5f, -0.5f,
-			-0.5f, -0.5f,  0.5f,
-			-0.5f,  0.5f,  0.5f,
-			-0.5f,  0.5f, -0.5f
+			-0.5f, -0.5f, 0.5f,
+			-0.5f, 0.5f, 0.5f,
+			-0.5f, 0.5f, -0.5f
 		)
 		// endregion
 

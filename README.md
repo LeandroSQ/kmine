@@ -12,6 +12,9 @@ Knowing that, started experimenting with creating a cube by its vertices and map
 
 ![Day 1](./.github/day1_0.png)
 
+The texture Atlas was made using [GDX Texture Packer](https://github.com/crashinvaders/gdx-texture-packer-gui)
+The textures used were fetched from the classic minecraft
+
 ---
 
 ### Day 2
@@ -47,3 +50,10 @@ But I ended up using OpenGL blending to achieve the effect
 Started experimenting with lighting as well, trying to make a day-night cycle
 And added the "torch cube" lol
 ![Day 3 - 0](./.github/day3_0.png)
+
+After a little bit of tweaking..
+![Day 3 - 1](./.github/day3_1.png)
+
+Also added a different font .ttf to the HUD
+Added support for varying display density
+And smoother camera movement

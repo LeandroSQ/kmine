@@ -41,7 +41,8 @@ tasks.register<JavaExec>("run") {
     isIgnoreExitValue = true
 
     if ("mac" in System.getProperty("os.name").toLowerCase()) {
-        jvmArgs("-XstartOnFirstThread")
+
+        jvmArgs("-XstartOnFirstThread", "-Xdock:name=KMine", "-Xdock:icon=${project.projectDir.absolutePath}/core/assets/icon128.png")
     }
 }
 
