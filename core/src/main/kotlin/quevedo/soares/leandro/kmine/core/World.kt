@@ -10,15 +10,15 @@ import com.badlogic.gdx.graphics.g3d.environment.PointLight
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector3
-import ktx.math.plus
-import ktx.math.vec3
+import ktx.math.*
 import quevedo.soares.leandro.kmine.core.models.WorldInfoWrapper
 import quevedo.soares.leandro.kmine.core.shader.MeshShader
 import quevedo.soares.leandro.kmine.core.terrain.Chunk
 import quevedo.soares.leandro.kmine.core.terrain.Cube
 import quevedo.soares.leandro.kmine.core.terrain.FallingCube
-import quevedo.soares.leandro.kmine.core.terrain.TerrainBuilder
+import quevedo.soares.leandro.kmine.core.terrain.TerrainGenerator
 import quevedo.soares.leandro.kmine.core.terrain.type.TorchCube
+import quevedo.soares.leandro.kmine.core.utils.Gizmo
 import quevedo.soares.leandro.kmine.core.utils.use
 import quevedo.soares.leandro.kmine.core.utils.vec3
 
@@ -29,7 +29,7 @@ class World {
 	private lateinit var modelBatch: ModelBatch
 	private lateinit var physics: Physics
 
-	private lateinit var meshShader: ShaderProgram
+	private lateinit var terrainGenerator: TerrainGenerator
 
 	private lateinit var sun: DirectionalLight
 
@@ -61,11 +61,8 @@ class World {
 	}
 
 	fun onCreate() {
-		this.physics = Physics()
-		this.physics.init()
-
-		this.meshShader = MeshShader.load()
-
+		this.setupPhysics()
+		this.setupTerrainGenerator()
 		this.setupModel()
 		this.setupEnvironment()
 		this.setupShapeRenderer()
@@ -73,14 +70,25 @@ class World {
 		this.testing()
 	}
 
+	private fun setupPhysics() {
+		this.physics = Physics()
+		this.physics.init()
+	}
+
+	private fun setupTerrainGenerator() {
+		this.terrainGenerator = TerrainGenerator().apply {
+			create()
+		}
+	}
+
 	private fun testing() {
 		var maxPos = Vector3.Zero
 		var maxChunk: Chunk = this.chunks.first()
 
 		for (chunk in this.chunks) {
-			for (x in 0 until chunk.xCount) {
-				for (z in 0 until chunk.zCount) {
-					chunk.getHighestCubeAt(x, z)?.position?.let { pos ->
+			for (x in 0 until chunk.width) {
+				for (z in 0 until chunk.depth) {
+					chunk.getHighest(x, z)?.position?.let { pos ->
 						if (pos.y > maxPos.y) {
 							maxPos = pos
 							maxChunk = chunk
@@ -91,12 +99,11 @@ class World {
 		}
 
 		// Appends a furnace in the middle of the map
-		var pos = maxPos + vec3(0, 1, 0)
-		maxChunk.setCubeAt(pos, TorchCube())
-		pos = maxChunk.absolutePosition(pos)
+		val pos = maxPos + vec3(0, 1, 0)
+		maxChunk.set(pos, TorchCube())
 		maxChunk.generateMesh()
 		environment.add(PointLight().apply {
-			position.set(pos + vec3(0, 2, 0))
+			position.set(pos + maxChunk.position + vec3(0f, 1.75f, 0f))
 			color.set(Color.CORAL)
 			intensity = 5f
 		})
@@ -113,19 +120,19 @@ class World {
 	private fun setupModel() {
 		this.modelBatch = ModelBatch()
 
-		this.chunks = TerrainBuilder.generateWorld(3)
+		this.chunks = terrainGenerator.generateBatch(10)
+
+		Gizmo.grid(Vector3(-0.5f, -0.5f, -0.5f), 20f, 16, Color(1f, 0.2f, 0.2f, 1f))
 
 		// Generate the chunks meshes
 		this.chunks.forEach {
 			it.generateMesh()
-			this.physics.addStaticEntity(it)
+			Gizmo.box(it.center + vec3(-0.5f, 0f, -0.5f), it.dimensions, Color(0f, 0f, 1f, 0.25f))
 		}
 	}
 
 	private fun setupShapeRenderer() {
-		this.debugRenderer = ShapeRenderer().apply {
-			color = Color(1f, 0f, 1f, 0.25f)
-		}
+//		this.debugRenderer = ShapeRenderer()
 	}
 
 	private var test = false
@@ -134,18 +141,21 @@ class World {
 		this.debugRenderer.projectionMatrix = Game.player.camera.combined
 		this.debugRenderer.use(ShapeRenderer.ShapeType.Line) {
 			for (chunk in this.chunks) {
-				val start = chunk.origin
+				val start = chunk.position
 				val center = chunk.center
 
 				if (!test) {
 					println("Start: ${start}, Dimensions: ${chunk.dimensions}")
 				}
 
-				this.debugRenderer.box(start.x, start.y, start.z, chunk.xCount.toFloat(), chunk.yCount.toFloat(), chunk.zCount.toFloat())
+				this.debugRenderer.color = Color(1f, 0f, 1f, 0.25f)
+				this.debugRenderer.box(start.x, start.y, start.z, chunk.width.toFloat(), chunk.height.toFloat(), -chunk.depth.toFloat())
+				this.debugRenderer.color = Color(0.1f, 0.3f, 1f, 0.25f)
 				this.debugRenderer.line(
 					vec3(center.x, start.y, center.z),
-					vec3(center.x, start.y + chunk.yCount, center.z),
+					vec3(center.x, start.y + chunk.height, center.z),
 				)
+				this.debugRenderer.color = Color(0f, 1f, 0f, 0.25f)
 			}
 
 			test = true
@@ -157,19 +167,20 @@ class World {
 
 		this.sun.direction.rotate(Vector3.Z, (Gdx.graphics.deltaTime * Math.PI * 0.75f).toFloat())
 
-		this.renderChunkBoundaries()
+//		this.renderChunkBoundaries()
+		Gizmo.render(this.modelBatch, this.environment)
 
-		this.meshShader.bind()
 		this.modelBatch.begin(Game.player.camera)
 		this.chunks.forEach {
-			it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.center, it.dimensions)
+			it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
 			if (it.isVisible) it.render(this.modelBatch, this.environment)
 		}
-		this.entities.forEach { it.render(this.modelBatch, this.environment) }
+		//this.entities.forEach { it.render(this.modelBatch, this.environment) }
 		this.modelBatch.end()
 	}
 
 	fun dispose() {
+		Gizmo.dispose()
 		this.modelBatch.dispose()
 		this.physics.dispose()
 		Cube.disposeTextures()

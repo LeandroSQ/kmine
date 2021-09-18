@@ -14,6 +14,8 @@ import ktx.math.vec2
 import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
 import quevedo.soares.leandro.kmine.core.utils.use
+import kotlin.math.ceil
+import kotlin.math.max
 
 private val FONT_SIZE = 46f * Gdx.graphics.density
 
@@ -27,11 +29,18 @@ class HUD {
 	private val width get() = this.camera.viewportWidth
 	private val height get() = this.camera.viewportHeight
 
+	private var line = 0
+
 	fun onCreate() {
 		this.createFont()
 		this.createCamera()
 		this.createSpriteBatch()
 		this.createShapeRenderer()
+	}
+
+	private fun renderText(text: String) {
+		val padding = 10f
+		this.font.draw(this.spriteBatch, text, padding, height - padding - font.lineHeight * (line ++))
 	}
 
 	private fun createFont() {
@@ -101,24 +110,28 @@ class HUD {
 	}
 
 	private fun renderFpsCounter() {
-		val padding = 10f
-		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", padding, height - padding)
+		val javaHeap = ceil(Gdx.app.javaHeap.toFloat() / 1024f / 1024f).toInt()
+		val nativeHeap = ceil(Gdx.app.nativeHeap.toFloat() / 1024f / 1024f).toInt()
+
+		this.renderText("FPS: ${Gdx.graphics.framesPerSecond}")
+		this.renderText( "Memory: ${max(javaHeap, nativeHeap)}MB")
 	}
 
 	private fun renderStatistics() {
-		val padding = 10f
 		Game.world.calculateStatistics().let {
-			this.font.draw(this.spriteBatch, "Vertices: ${it.visibleVerticesCount} / ${it.totalVerticesCount}", padding, height - padding - font.lineHeight)
-			this.font.draw(this.spriteBatch, "Indices: ${it.visibleIndicesCount} / ${it.totalIndicesCount}", padding, height - padding - font.lineHeight * 2)
-			this.font.draw(this.spriteBatch, "Chunks: ${it.visibleChunksCount} / ${it.totalChunksCount}", padding, height - padding - font.lineHeight * 3)
+			this.renderText("Vertices: ${it.visibleVerticesCount} / ${it.totalVerticesCount}")
+			this.renderText("Indices: ${it.visibleIndicesCount} / ${it.totalIndicesCount}")
+			this.renderText("Chunks: ${it.visibleChunksCount} / ${it.totalChunksCount}")
 		}
 
 		Game.player.position.let {
-			this.font.draw(this.spriteBatch, "Player: { %.2f, %.2f, %.2f }".format(it.x, it.y, it.z), padding, height - padding - font.lineHeight * 4)
+			this.renderText("Player: { %.2f, %.2f, %.2f }".format(it.x, it.y, it.z))
 		}
 	}
 
 	fun render() {
+		this.line = 0
+
 		this.spriteBatch.begin()
 		this.renderCrosshair()
 		this.renderFpsCounter()

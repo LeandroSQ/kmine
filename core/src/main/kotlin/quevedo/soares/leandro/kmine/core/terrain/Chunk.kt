@@ -2,184 +2,202 @@ package quevedo.soares.leandro.kmine.core.terrain
 
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
-import com.badlogic.gdx.graphics.g3d.*
+import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.Material
+import com.badlogic.gdx.graphics.g3d.ModelBatch
+import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.graphics.g3d.model.MeshPart
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
-import ktx.math.minus
+import ktx.math.div
 import ktx.math.plus
-import ktx.math.vec3
-import quevedo.soares.leandro.kmine.core.PhysicsEntity
+import quevedo.soares.leandro.kmine.core.enums.CubeFace
+import quevedo.soares.leandro.kmine.core.models.PhysicsProperties
 import quevedo.soares.leandro.kmine.core.utils.*
+import com.badlogic.gdx.math.collision.BoundingBox
+
+private const val MESH_ATTRIBUTES = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.TextureCoordinates).toLong()
 
 @Suppress("NOTHING_TO_INLINE")
-class Chunk : PhysicsEntity {
+class Chunk(position: Vector3, val width: Int, val height: Int, val depth: Int) {
 
-	private lateinit var model: Model
-	private lateinit var modelInstance: ModelInstance
-
-	var isVisible: Boolean = true
-
-	var verticesCount: Int = 0
+	var renderable: Renderable? = null
 		private set
 
 	var indicesCount: Int = 0
 		private set
+	var verticesCount: Int = 0
+		private set
 
-	var cubes: ArrayList<ArrayList<ArrayList<Cube?>>> = arrayListOf()
+	var isDirty = false
+		private set
 
-	override var collisionObject: btCollisionObject? = null
-	override var rigidBody: btRigidBody? = null
+	var physics: PhysicsProperties? = null
+		private set
 
-	var origin = Vector3.Zero
-	val dimensions
-		get() = vec3(this.xCount, this.yCount, this.zCount)
-	val center
-		get() = vec3(this.origin.x + this.xCount / 2f, this.origin.y + this.yCount / 2f, this.origin.z + this.zCount / 2f)
+	var boundingBox = BoundingBox()
 
-	// region Utilities
-	val xCount get() = this.cubes.size
-	val yCount get() = this.cubes.first().size
-	val zCount get() = this.cubes.first().first().size
+	var position = position
+	var quaternion = Quaternion(0f, 0f, 0f, 0f)
+	val transform get() = Matrix4(this.position, this.quaternion, vec3(1, 1, 1))
+
+	private val material = Material(
+		TextureAttribute.createDiffuse(Cube.texture),
+		BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+	)
+
+	val cubeCount get() = width * height * depth
+
+	val dimensions get() = vec3(this.width, this.height, this.depth)
+	val center get() = this.position + this.dimensions / 2
+
+	lateinit var cubes: CubeMatrix
+		private set
+
+	var isVisible = true
+
+	init {
+		// Fills the chunk with empty cubes
+		this.cubes = CubeMatrix(width, height, depth, EMPTY)
+	}
+
+	// region Array get/set
+
+	inline fun get(position: Vector3) = this.get(position.xInt, position.yInt, position.zInt)
+	fun get(x: Int, y: Int, z: Int): Cube? {
+		if (x < 0 || y < 0 || z < 0 || x >= width || y >= height || z >= depth) return null
+
+		return this.cubes.get(x, y, z)
+	}
+
+	inline fun set(position: Vector3, cube: Cube?) = this.set(position.xInt, position.yInt, position.zInt, cube)
+	fun set(x: Int, y: Int, z: Int, cube: Cube?) {
+		this.cubes.set(x, y, z, cube)
+		this.isDirty = true
+	}
+
+	inline fun isEmpty(position: Vector3) = this.isEmpty(position.xInt, position.yInt, position.zInt)
+
+	inline fun isEmpty(x: Int, y: Int, z: Int) = this.get(x, y, z) == Chunk.EMPTY
 	// endregion
 
-	fun fillWith(size: Int, altitude: Int, cube: Cube? = null) {
-		val xBuffer = arrayListOf<ArrayList<ArrayList<Cube?>>>()
-		for (x in 0 until size) {
-			val yBuffer = arrayListOf<ArrayList<Cube?>>()
-
-			for (y in 0 until altitude) {
-				val zBuffer = arrayListOf<Cube?>()
-				for (z in 0 until size) {
-					zBuffer.add(cube)
-				}
-
-				yBuffer.add(zBuffer)
-			}
-
-			xBuffer.add(yBuffer)
-		}
-
-		this.cubes = xBuffer
+	fun fill(cube: Cube?) {
+		this.cubes = CubeMatrix(this.width, this.height, this.depth, cube)
+		this.isDirty = true
 	}
 
-	fun getCubeAt(position: Vector3): Cube? {
-		if (position.xInt >= this.xCount || position.yInt >= this.yCount || position.zInt >= this.zCount || position.xInt < 0 || position.yInt < 0 || position.zInt < 0) return null
-		return cubes[position.xInt][position.yInt][position.zInt]
-	}
-
-	fun setCubeAt(position: Vector3, cube: Cube?) {
-		cube?.position = position
-		this.cubes[position.x.toInt()][position.y.toInt()][position.z.toInt()] = cube
-	}
-
-	fun absolutePosition(relativePosition: Vector3) = relativePosition + this.origin
-	fun relativePosition(absolutePosition: Vector3) = absolutePosition - this.origin
-
-	private inline fun isCubeEmptyAt(x: Int, y: Int, z: Int): Boolean {
-		val cube = this.getCubeAt(vec3(x, y, z))
-		return cube == null || cube.isTranslucent
-	}
-
-	fun getHighestCubeAt(x: Int, z: Int): Cube? {
-		for (y in 1 until this.cubes[x].size) {
-			val cube = this.cubes[x][this.cubes[x].size - y][z]
-			if (cube != null) return cube
+	inline fun getHighest(position: Vector3) = this.getHighest(position.xInt, position.zInt)
+	fun getHighest(x: Int, z: Int): Cube? {
+		for (y in 0 until this.height) {
+			val cube = this.get(x, this.height - y, z)
+			if (cube !== EMPTY) return cube
 		}
 
 		return null
 	}
 
-	fun generateMesh() {
-		val material = Material(TextureAttribute.createDiffuse(Cube.texture), BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA))
-		val attributes = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.TextureCoordinates).toLong()
-
-		// if (this.model::isInitialized) this.model.dispose()
-		this.model = ModelBuilder().run {
-			begin()
-
-			part("mesh", GL20.GL_TRIANGLES, attributes, material).apply {
-				for (x in 0 until cubes.size) {
-					for (y in 0 until cubes[x].size) {
-						for (z in 0 until cubes[x][y].size) {
-							// Ignore empty cubes
-							val cube = cubes[x][y][z] ?: continue
-
-							// Define the cube position
-							val offset = (vec3(x, y, z) + origin).toFloatArray()
-
-							// Top
-							if (isCubeEmptyAt(x, y + 1, z)) addQuad(cube.topFace, cube.topNormal, offset, Cube.atlas, cube.textureMap.top)
-							// Bottom
-							if (isCubeEmptyAt(x, y - 1, z)) addQuad(cube.bottomFace, cube.bottomNormal, offset, Cube.atlas, cube.textureMap.bottom)
-							// Left
-							if (isCubeEmptyAt(x - 1, y, z)) addQuad(cube.leftFace, cube.leftNormal, offset, Cube.atlas, cube.textureMap.left)
-							// Right
-							if (isCubeEmptyAt(x + 1, y, z)) addQuad(cube.rightFace, cube.rightNormal, offset, Cube.atlas, cube.textureMap.right)
-							// Front
-							if (isCubeEmptyAt(x, y, z + 1)) addQuad(cube.frontFace, cube.frontNormal, offset, Cube.atlas, cube.textureMap.front)
-							// Back
-							if (isCubeEmptyAt(x, y, z - 1)) addQuad(cube.backFace, cube.backNormal, offset, Cube.atlas, cube.textureMap.back)
-						}
-					}
-				}
-			}
-
-			end()
-		}
-
-		this.verticesCount = this.model.meshParts.sumOf { it.mesh.numVertices }
-		this.indicesCount = this.model.meshParts.sumOf { it.mesh.numIndices }
-
-		this.modelInstance = ModelInstance(this.model)
-		println("Chunk pos: ${this.origin} - ${this.dimensions}")
-		//this.modelInstance.transform.setTranslation(this.origin)
-
-		//if (this.collisionObject != null || this.rigidBody != null) this.disposeCollisionObject()
-		//generateCollisionObject()
+	/**
+	 * Validates whether a face should be generated and baked into the chunk's mesh
+	 * by verifying when theres a non-empty neighbouring cube that's not translucent
+	 **/
+	private fun shouldDrawFace(x: Int, y: Int, z: Int): Boolean {
+		val cube = this.get(x, y, z)
+		return cube == EMPTY || cube.isTranslucent
 	}
 
-	private fun generateCollisionObject() {
-		// Abstracts the transform
-		val transform = Matrix4()
-		transform.setTranslation(this.origin)
-		transform.setToScaling(Vector3(1f, 1f, 1f))
+	private fun addFace(mesh: MeshBuilder, cube: Cube, offset: FloatArray, face: CubeFace): Int {
+		return when (face) {
+			CubeFace.TOP -> mesh.addQuad(cube.topFace, cube.topNormal, offset, Cube.atlas, cube.textureMap.top)
+			CubeFace.BOTTOM -> mesh.addQuad(cube.bottomFace, cube.bottomNormal, offset, Cube.atlas, cube.textureMap.bottom)
+			CubeFace.LEFT -> mesh.addQuad(cube.leftFace, cube.leftNormal, offset, Cube.atlas, cube.textureMap.left)
+			CubeFace.RIGHT -> mesh.addQuad(cube.rightFace, cube.rightNormal, offset, Cube.atlas, cube.textureMap.right)
+			CubeFace.FRONT -> mesh.addQuad(cube.frontFace, cube.frontNormal, offset, Cube.atlas, cube.textureMap.front)
+			CubeFace.BACK -> mesh.addQuad(cube.backFace, cube.backNormal, offset, Cube.atlas, cube.textureMap.back)
+		}
+	}
 
-		this.collisionObject = btCollisionObject().apply {
-			collisionShape = btBvhTriangleMeshShape(model.meshParts)
-			worldTransform = transform
+	private fun createPhysicsProperties() {
+		// Defines the collision shape to be the generated mesh
+		//val shape = btBvhTriangleMeshShape(Array.with(renderable!!.meshPart))
+		// Creates a physics wrapper
+		//this.physics = PhysicsProperties(shape, transform, mass = 1f)
+	}
+
+	private fun createRenderable(mesh: MeshPart) {
+		// Creates the renderable
+		this.renderable = Renderable().also {
+			it.worldTransform.set(this.position, this.quaternion)
+			it.meshPart.set(mesh)
+			it.material = this.material
 		}
 
-		// Create motion state
-		val motionState = btDefaultMotionState()
-		motionState.setWorldTransform(transform)
+		this.createPhysicsProperties()
+	}
 
-		// Create rigid body
-		val constructionInfo = btRigidBody.btRigidBodyConstructionInfo(0f, motionState, collisionObject?.collisionShape, Vector3.Zero)
-		this.rigidBody = btRigidBody(constructionInfo).apply {
-			friction = 0f
+	fun generateMesh() {
+		var verticesCount = 0
+
+		val builder = MeshBuilder()
+		builder.begin(MESH_ATTRIBUTES, GL20.GL_TRIANGLES)
+
+		this.cubes.forEach { x, y, z, cube ->
+			// Ignore empty cubes
+			if (cube == EMPTY) return@forEach
+
+			// Calculate the cube absolute position
+			val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
+
+			// Append the faces
+			if (shouldDrawFace(x, y + 1, z)) verticesCount += addFace(builder, cube, offset, CubeFace.TOP)
+			if (shouldDrawFace(x, y - 1, z)) verticesCount += addFace(builder, cube, offset, CubeFace.BOTTOM)
+			if (shouldDrawFace(x - 1, y, z)) verticesCount += addFace(builder, cube, offset, CubeFace.LEFT)
+			if (shouldDrawFace(x + 1, y, z)) verticesCount += addFace(builder, cube, offset, CubeFace.RIGHT)
+			if (shouldDrawFace(x, y, z + 1)) verticesCount += addFace(builder, cube, offset, CubeFace.FRONT)
+			if (shouldDrawFace(x, y, z - 1)) verticesCount += addFace(builder, cube, offset, CubeFace.BACK)
 		}
+
+		val mesh = builder.end()
+		// For some reason, the vertices count need to be divided by 2
+		// And using mesh.numVertices simply doesn't works
+		val meshPart = MeshPart("mesh", mesh, 0, verticesCount / 2, GL20.GL_TRIANGLES)
+
+		// Stores the mesh attributes
+		this.verticesCount = verticesCount
+		this.indicesCount = verticesCount * 3
+		this.boundingBox = mesh.calculateBoundingBox().apply {
+			this.mul(Matrix4().apply {
+				setTranslation(position)
+			})
+		}
+
+		// Creates the renderable based on the generated mesh
+		this.createRenderable(meshPart)
+
+		this.isDirty = false
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {
-		modelBatch.render(this.modelInstance, environment)
+		this.renderable?.let {
+			it.environment = environment
+			modelBatch.render(it)
+		}
 	}
 
-	private fun disposeCollisionObject() {
-		this.collisionObject?.collisionShape?.dispose()
-		this.collisionObject?.dispose()
-		this.rigidBody?.dispose()
+	fun dispose() {
+		this.cubes.clear()
+		this.renderable?.meshPart?.mesh?.dispose()
+		this.renderable?.shader?.dispose()
+		this.physics?.dispose()
 	}
 
-	override fun dispose() {
-		this.disposeCollisionObject()
-		this.model.dispose()
+	companion object {
+
+		val EMPTY = null
+
 	}
 
 }

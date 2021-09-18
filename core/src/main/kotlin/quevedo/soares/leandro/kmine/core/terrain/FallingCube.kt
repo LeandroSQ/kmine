@@ -11,17 +11,16 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
 import com.badlogic.gdx.physics.bullet.collision.btBoxShape
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
-import quevedo.soares.leandro.kmine.core.PhysicsEntity
 import quevedo.soares.leandro.kmine.core.utils.addQuad
 
 const val GRAVITY = 0.1f
 
-open class FallingCube: Cube, PhysicsEntity {
+open class FallingCube {
 
-	private lateinit var model: Model
+	/*private lateinit var model: Model
 	private lateinit var modelInstance: ModelInstance
-	override var collisionObject: btCollisionObject? = null
-	override var rigidBody: btRigidBody? = null
+	//override var collisionObject: btCollisionObject? = null
+	//override var rigidBody: btRigidBody? = null
 	var isGrounded = false
 
 	constructor() : super() {
@@ -121,6 +120,6 @@ open class FallingCube: Cube, PhysicsEntity {
 	override fun dispose() {
 		this.disposeCollisionObject()
 		this.model.dispose()
-	}
+	}*/
 
 }

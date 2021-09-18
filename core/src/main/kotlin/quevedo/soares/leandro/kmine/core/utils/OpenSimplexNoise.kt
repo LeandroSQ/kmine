@@ -22,6 +22,14 @@ class OpenSimplexNoise(seed: Long) {
 	private val permGrad2: Array<Grad2?>
 	private val permGrad3: Array<Grad3?>
 	private val permGrad4: Array<Grad4?>
+
+	// fun noise2D(x: Int, z: Int, min: Float = 0f, max: Float = 1f): Float = this.noise2D(x, z, min, max)
+	/** Simpler utilitary function to handle 2d noise **/
+	fun noise2D(x: Float, z: Float, min: Float = 0f, max: Float = 1f): Float {
+		val value = (noise2(x.toDouble(), z.toDouble()).toFloat() + 1f) / 2f
+		return value * (max - min) + min
+	}
+
 	/*
 	 * Noise Evaluators
 	 */

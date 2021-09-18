@@ -7,16 +7,16 @@ import quevedo.soares.leandro.kmine.core.terrain.FallingCube
 
 class SandCube : FallingCube {
 
-	override var textureMap = CubeFaceTextureMap(
+	/*override var textureMap = CubeFaceTextureMap(
 		singleTexture = CubeTexture.SAND
-	)
+	)*/
 
 	constructor() : super() {
 
 	}
 
-	constructor(position: Vector3) : super(position) {
+	/*constructor(position: Vector3) : super(position) {
 
-	}
+	}*/
 
 }

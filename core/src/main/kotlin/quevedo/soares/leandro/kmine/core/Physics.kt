@@ -1,28 +1,18 @@
 package quevedo.soares.leandro.kmine.core
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
-
-interface PhysicsEntity {
-	var collisionObject: btCollisionObject?
-	var rigidBody: btRigidBody?
-	val collisionShape: btCollisionShape? get() = this.collisionObject?.collisionShape
-
-	fun dispose() {
-		this.collisionShape?.dispose()
-		this.collisionObject?.dispose()
-		this.rigidBody?.dispose()
-	}
-}
+import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
+import com.badlogic.gdx.physics.bullet.linearmath.btMotionState
 
 internal const val ENABLED = false
 
 class Physics {
-	private val objects = arrayListOf<PhysicsEntity>()
 
 	private lateinit var collisionConfig: btCollisionConfiguration
 	private lateinit var dispatcher: btDispatcher
@@ -46,27 +36,13 @@ class Physics {
 		world.stepSimulation(Gdx.graphics.deltaTime, 5)
 	}
 
-	fun addStaticEntity(entity: PhysicsEntity) {
-		if (!ENABLED) return
-
-		world.addRigidBody(entity.rigidBody, btBroadphaseProxy.CollisionFilterGroups.StaticFilter, btBroadphaseProxy.CollisionFilterGroups.CharacterFilter or btBroadphaseProxy.CollisionFilterGroups.DefaultFilter)
-		this.objects.add(entity)
-	}
-
-	fun addEntity(entity: PhysicsEntity) {
-		if (!ENABLED) return
-
-		world.addRigidBody(entity.rigidBody)
-		this.objects.add(entity)
-	}
-
 	fun dispose() {
 		if (!ENABLED) return
 
-		this.collisionConfig.dispose()
+		/*this.collisionConfig.dispose()
 		this.dispatcher.dispose()
 		this.btSweep3.dispose()
-		this.objects.forEach { it.dispose() }
+		this.objects.forEach { it.dispose() }*/
 	}
 
 }

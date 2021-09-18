@@ -10,6 +10,8 @@ dependencies {
 
     implementation(kotlin("stdlib"))
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-bullet:$gdxVersion")

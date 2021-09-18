@@ -36,7 +36,7 @@ class Player {
 		}
 
 		val centerChunk = Game.world.chunks[Game.world.chunks.size / 2]
-		centerChunk.getHighestCubeAt(centerChunk.xCount / 2, centerChunk.zCount / 2)?.position?.cpy()?.let {
+		centerChunk.getHighest(centerChunk.width / 2, centerChunk.depth / 2)?.position?.cpy()?.let {
 			this.position = it + Vector3.Y * 2
 		}
 	}

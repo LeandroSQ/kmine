@@ -4,9 +4,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.enums.CubeTexture
+
+fun clamp(x: Int, min: Int, max: Int) = if (x > max) max else if (x < min) min else x
 
 fun ShapeRenderer.use(shapeType: ShapeRenderer.ShapeType = ShapeRenderer.ShapeType.Filled, callback: () -> Unit) {
 	this.begin(shapeType)
@@ -36,8 +39,9 @@ fun FloatArray.add(other: FloatArray): FloatArray {
 	}
 }
 
-fun MeshPartBuilder.addQuad(vertices: FloatArray, normals: FloatArray, origin: FloatArray, textureAtlas: TextureAtlas, textureRegion: CubeTexture) {
+fun MeshPartBuilder.addQuad(vertices: FloatArray, normals: FloatArray, origin: FloatArray, textureAtlas: TextureAtlas, textureRegion: CubeTexture): Int {
 	val v = vertices.add(origin)
 	this.setUVRange(textureAtlas.findRegion(textureRegion.regionName))
 	this.rect(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], normals[0], normals[1], normals[2])
+	return vertices.size
 }

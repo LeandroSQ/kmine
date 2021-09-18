@@ -31,13 +31,17 @@ object Game : ApplicationAdapter() {
     override fun render() {
         HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
-//        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
-//        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
+
 //        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL)
 
         this.player.update()
 
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE)
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
         this.world.render()
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE)
+        Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
+
         Gdx.gl20.glEnable(GL20.GL_BLEND)
         Gdx.gl20.glBlendFunc(GL20.GL_ONE_MINUS_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
         this.hud.render()
