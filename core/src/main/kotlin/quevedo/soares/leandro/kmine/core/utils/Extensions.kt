@@ -23,6 +23,8 @@ inline val Vector3.xInt get() = this.x.toInt()
 inline val Vector3.yInt get() = this.y.toInt()
 inline val Vector3.zInt get() = this.z.toInt()
 
+fun Vector3.toFloatArray() = floatArrayOf(this.x, this.y, this.z)
+
 fun FloatArray.add(other: FloatArray): FloatArray {
 	this.clone().apply {
 		for (i in 0 until this.size) {

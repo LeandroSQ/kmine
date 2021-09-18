@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.math.Vector3
+import ktx.math.plus
 import ktx.math.times
 import ktx.math.vec3
 
@@ -14,20 +15,30 @@ private const val MAX_CAMERA_PITCH = 0.987f
 
 class Player {
 
-	var position: Vector3 = Vector3(8f, 16f, 8f)
+	var position: Vector3
+		get() = this.camera.position
+		set(value) { camera.position.set(value) }
+
 	private var isCameraDirty = false
 
 	private var isCapturingInput = true
 
-	val camera: PerspectiveCamera = PerspectiveCamera(FOV, Gdx.graphics.width * Gdx.graphics.density, Gdx.graphics.height * Gdx.graphics.density).apply {
-		position.set(this@Player.position)
-		near = 1f
-		far = 300f
-		update()
-	}
+	lateinit var camera: PerspectiveCamera
+		private set
 
-	init {
+	fun onCreate() {
 		Gdx.input.isCursorCatched = true
+
+		this.camera = PerspectiveCamera(FOV, Gdx.graphics.width * Gdx.graphics.density, Gdx.graphics.height * Gdx.graphics.density).apply {
+			near = 1f
+			far = 300f
+			update()
+		}
+
+		val centerChunk = Game.world.chunks[Game.world.chunks.size / 2]
+		centerChunk.getHighestCubeAt(centerChunk.xCount / 2, centerChunk.zCount / 2)?.position?.cpy()?.let {
+			this.position = it + Vector3.Y * 2
+		}
 	}
 
 	private fun translateCamera(direction: Vector3) {

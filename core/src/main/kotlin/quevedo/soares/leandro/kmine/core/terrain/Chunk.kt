@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
-import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -15,8 +14,8 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
 import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
 import ktx.math.minus
 import ktx.math.plus
+import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.PhysicsEntity
-import quevedo.soares.leandro.kmine.core.enums.CubeTexture
 import quevedo.soares.leandro.kmine.core.utils.*
 
 @Suppress("NOTHING_TO_INLINE")
@@ -24,6 +23,8 @@ class Chunk : PhysicsEntity {
 
 	private lateinit var model: Model
 	private lateinit var modelInstance: ModelInstance
+
+	var isVisible: Boolean = true
 
 	var verticesCount: Int = 0
 		private set
@@ -37,6 +38,10 @@ class Chunk : PhysicsEntity {
 	override var rigidBody: btRigidBody? = null
 
 	var origin = Vector3.Zero
+	val dimensions
+		get() = vec3(this.xCount, this.yCount, this.zCount)
+	val center
+		get() = vec3(this.origin.x + this.xCount / 2f, this.origin.y + this.yCount / 2f, this.origin.z + this.zCount / 2f)
 
 	// region Utilities
 	val xCount get() = this.cubes.size
@@ -107,7 +112,7 @@ class Chunk : PhysicsEntity {
 							val cube = cubes[x][y][z] ?: continue
 
 							// Define the cube position
-							val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
+							val offset = (vec3(x, y, z) + origin).toFloatArray()
 
 							// Top
 							if (isCubeEmptyAt(x, y + 1, z)) addQuad(cube.topFace, cube.topNormal, offset, Cube.atlas, cube.textureMap.top)
@@ -133,7 +138,8 @@ class Chunk : PhysicsEntity {
 		this.indicesCount = this.model.meshParts.sumOf { it.mesh.numIndices }
 
 		this.modelInstance = ModelInstance(this.model)
-		this.modelInstance.transform.setTranslation(this.origin)
+		println("Chunk pos: ${this.origin} - ${this.dimensions}")
+		//this.modelInstance.transform.setTranslation(this.origin)
 
 		//if (this.collisionObject != null || this.rigidBody != null) this.disposeCollisionObject()
 		//generateCollisionObject()

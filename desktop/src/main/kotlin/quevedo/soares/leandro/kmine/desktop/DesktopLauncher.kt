@@ -26,7 +26,7 @@ object DesktopLauncher {
 
 	@JvmStatic
 	fun main(args: Array<String>) {
-		Lwjgl3Application(Game(), Lwjgl3ApplicationConfiguration().apply {
+		Lwjgl3Application(Game, Lwjgl3ApplicationConfiguration().apply {
 			setTitle("KMine")
 			setWindowSizeLimits(640, 580, -1, -1)
 			setHdpiMode(HdpiMode.Logical)

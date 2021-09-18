@@ -5,16 +5,24 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.models.CubeFaceTextureMap
+import quevedo.soares.leandro.kmine.core.piranha.Chunk
 
 abstract class Cube {
 
 	open var position: Vector3 = Vector3.Zero
+	var chunk: Chunk? = null
+
 	open lateinit var textureMap: CubeFaceTextureMap
+
 	open var isTranslucent: Boolean = false
 
-	constructor() {}
+	constructor()
 	constructor(position: Vector3) {
 		this.position = position
+	}
+	constructor(position: Vector3, chunk: Chunk) {
+		this.position = position
+		this.chunk = chunk
 	}
 
 	open val frontNormal get() = Cube.frontNormal

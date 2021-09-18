@@ -8,13 +8,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import ktx.math.minus
+import ktx.math.plus
 import ktx.math.vec2
+import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
 import quevedo.soares.leandro.kmine.core.utils.use
 
 private val FONT_SIZE = 46f * Gdx.graphics.density
 
-class HUDController {
+class HUD {
 
 	private lateinit var font: BitmapFont
 	private lateinit var spriteBatch: SpriteBatch
@@ -24,7 +27,7 @@ class HUDController {
 	private val width get() = this.camera.viewportWidth
 	private val height get() = this.camera.viewportHeight
 
-	fun create() {
+	fun onCreate() {
 		this.createFont()
 		this.createCamera()
 		this.createSpriteBatch()
@@ -102,17 +105,24 @@ class HUDController {
 		this.font.draw(this.spriteBatch, "FPS: ${Gdx.graphics.framesPerSecond}", padding, height - padding)
 	}
 
-	private fun renderStatistics(world: World) {
+	private fun renderStatistics() {
 		val padding = 10f
-		this.font.draw(this.spriteBatch, "Vertices: ${world.verticesCount}", padding, height - padding - font.lineHeight)
-		this.font.draw(this.spriteBatch, "Indices: ${world.indicesCount}", padding, height - padding - font.lineHeight * 2)
+		Game.world.calculateStatistics().let {
+			this.font.draw(this.spriteBatch, "Vertices: ${it.visibleVerticesCount} / ${it.totalVerticesCount}", padding, height - padding - font.lineHeight)
+			this.font.draw(this.spriteBatch, "Indices: ${it.visibleIndicesCount} / ${it.totalIndicesCount}", padding, height - padding - font.lineHeight * 2)
+			this.font.draw(this.spriteBatch, "Chunks: ${it.visibleChunksCount} / ${it.totalChunksCount}", padding, height - padding - font.lineHeight * 3)
+		}
+
+		Game.player.position.let {
+			this.font.draw(this.spriteBatch, "Player: { %.2f, %.2f, %.2f }".format(it.x, it.y, it.z), padding, height - padding - font.lineHeight * 4)
+		}
 	}
 
-	fun render(world: World) {
+	fun render() {
 		this.spriteBatch.begin()
 		this.renderCrosshair()
 		this.renderFpsCounter()
-		this.renderStatistics(world)
+		this.renderStatistics()
 		this.spriteBatch.end()
 	}
 

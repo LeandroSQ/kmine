@@ -5,24 +5,27 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.physics.bullet.Bullet
-import java.awt.Image
-import javax.swing.ImageIcon
 
 
 val ANTIALIASING by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
-class Game : ApplicationAdapter() {
+object Game : ApplicationAdapter() {
 
-    private var hud = HUDController()
-    private var world = World()
-    private lateinit var player: Player
+    var hud = HUD()
+        private set
+
+    var world = World()
+        private set
+
+    var player = Player()
+        private set
 
     override fun create() {
         Bullet.init()
 
-        this.player = Player()
-        this.world.create()
-        this.hud.create()
+        this.world.onCreate()
+        this.player.onCreate()
+        this.hud.onCreate()
     }
 
     override fun render() {
@@ -34,10 +37,10 @@ class Game : ApplicationAdapter() {
 
         this.player.update()
 
-        this.world.render(this.player.camera)
+        this.world.render()
         Gdx.gl20.glEnable(GL20.GL_BLEND)
         Gdx.gl20.glBlendFunc(GL20.GL_ONE_MINUS_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
-        this.hud.render(this.world)
+        this.hud.render()
         Gdx.gl20.glDisable(GL20.GL_BLEND)
     }
 
