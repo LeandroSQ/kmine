@@ -32,7 +32,7 @@ object DesktopLauncher {
 			setHdpiMode(HdpiMode.Logical)
 			useVsync(true)
 			setForegroundFPS(0)
-			setInitialBackgroundColor(Color(60 / 255f, 174 / 255f, 243 / 255f, 1f))
+			setInitialBackgroundColor(Color(60 / 255f, 174 / 255f, 243 / 255f, 0f))
 			setWindowIcon("icons/icon128.png", "icons/icon64.png", "icons/icon32.png", "icons/icon16.png")
 		})
 	}

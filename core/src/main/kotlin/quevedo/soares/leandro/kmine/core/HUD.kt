@@ -2,16 +2,14 @@ package quevedo.soares.leandro.kmine.core
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import ktx.math.minus
-import ktx.math.plus
 import ktx.math.vec2
-import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
 import quevedo.soares.leandro.kmine.core.utils.use
 import kotlin.math.ceil
@@ -110,17 +108,40 @@ class HUD {
 	}
 
 	private fun renderFpsCounter() {
-		val javaHeap = ceil(Gdx.app.javaHeap.toFloat() / 1024f / 1024f).toInt()
-		val nativeHeap = ceil(Gdx.app.nativeHeap.toFloat() / 1024f / 1024f).toInt()
+		val javaHeap = Gdx.app.javaHeap
+
+		val runtime = Runtime.getRuntime()
+		val used = runtime.totalMemory() - runtime.freeMemory()
 
 		this.renderText("FPS: ${Gdx.graphics.framesPerSecond}")
-		this.renderText( "Memory: ${max(javaHeap, nativeHeap)}MB")
+		this.renderText( "Memory: ${formatSize(max(javaHeap, used))}B")
+	}
+
+	fun formatSize(v: Int) = this.formatSize(v.toLong())
+	fun formatSize(bytes: Long): String {
+		val unit = 1000.0
+		if (bytes < unit)
+			return "$bytes"
+		var result = bytes.toDouble()
+		val unitsToUse = "KMGTPE"
+		var i = 0
+		val unitsCount = unitsToUse.length
+		while (true) {
+			result /= unit
+			if (result < unit || i == unitsCount - 1)
+				break
+			++i
+		}
+		return with(StringBuilder(9)) {
+			append(String.format("%.1f ", result))
+			append(unitsToUse[i])
+		}.toString()
 	}
 
 	private fun renderStatistics() {
 		Game.world.calculateStatistics().let {
-			this.renderText("Vertices: ${it.visibleVerticesCount} / ${it.totalVerticesCount}")
-			this.renderText("Indices: ${it.visibleIndicesCount} / ${it.totalIndicesCount}")
+			this.renderText("Vertices: ${formatSize(it.visibleVerticesCount)} / ${formatSize(it.totalVerticesCount)}")
+			this.renderText("Indices: ${formatSize(it.visibleIndicesCount)} / ${formatSize(it.totalIndicesCount)}")
 			this.renderText("Chunks: ${it.visibleChunksCount} / ${it.totalChunksCount}")
 		}
 
@@ -130,6 +151,10 @@ class HUD {
 	}
 
 	fun render() {
+		// Sets the blending function to subtract the incoming pixels with the already drawn ones
+		Gdx.gl20.glEnable(GL20.GL_BLEND)
+		Gdx.gl20.glBlendFunc(GL20.GL_ONE_MINUS_DST_COLOR, GL20.GL_ONE_MINUS_SRC_COLOR)
+
 		this.line = 0
 
 		this.spriteBatch.begin()
@@ -137,6 +162,8 @@ class HUD {
 		this.renderFpsCounter()
 		this.renderStatistics()
 		this.spriteBatch.end()
+
+		Gdx.gl20.glDisable(GL20.GL_BLEND)
 	}
 
 	fun dispose() {

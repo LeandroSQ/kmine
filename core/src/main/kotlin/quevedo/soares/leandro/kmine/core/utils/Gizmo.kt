@@ -3,10 +3,7 @@ package quevedo.soares.leandro.kmine.core.utils
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.VertexAttributes
-import com.badlogic.gdx.graphics.g3d.Environment
-import com.badlogic.gdx.graphics.g3d.Material
-import com.badlogic.gdx.graphics.g3d.ModelBatch
-import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
 import com.badlogic.gdx.math.Quaternion
@@ -35,12 +32,19 @@ object Gizmo {
 		})
 	}
 
-	fun line(start: Vector3, end: Vector3, color: Color) {
+	fun directionArrows(center: Vector3, dimensions: Vector3) {
+		this.line(center + dimensions * Vector3.Z, center + dimensions * Vector3.Z * 1.5f, Color.BLUE)
+		this.line(center + dimensions * Vector3.X, center + dimensions * Vector3.X * 1.5f, Color.GREEN)
+		this.line(center + dimensions * Vector3.Y , center + dimensions * Vector3.Y * 1.5f, Color.RED)
+	}
+
+	fun line(start: Vector3, end: Vector3, color: Color, ignore: Boolean = false): Model {
 		val material = Material(ColorAttribute.createDiffuse(color))
 		val attributes = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.ColorPacked).toLong()
 		val model = ModelBuilder().createArrow(start, end, material, attributes)
 
-		this.models.add(ModelInstance(model))
+		if (!ignore) this.models.add(ModelInstance(model))
+		return model
 	}
 
 	fun lines(center: Vector3, size: Vector3, color: Color) {

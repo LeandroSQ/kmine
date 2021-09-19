@@ -45,28 +45,28 @@ abstract class Cube {
 	companion object {
 
 		// region Normals
-		private val frontNormal = floatArrayOf(0f, 0f, 1f)
+		val frontNormal = floatArrayOf(0f, 0f, 1f)
 
-		private val backNormal = floatArrayOf(0f, 0f, -1f)
+		val backNormal = floatArrayOf(0f, 0f, -1f)
 
-		private val topNormal = floatArrayOf(0f, 1f, 0f)
+		val topNormal = floatArrayOf(0f, 1f, 0f)
 
-		private val bottomNormal = floatArrayOf(0f, -1f, 0f)
+		val bottomNormal = floatArrayOf(0f, -1f, 0f)
 
-		private val leftNormal = floatArrayOf(-1f, 0f, 0f)
+		val leftNormal = floatArrayOf(-1f, 0f, 0f)
 
-		private val rightNormal = floatArrayOf(1f, 0f, 0f)
+		val rightNormal = floatArrayOf(1f, 0f, 0f)
 		// endregion
 
 		// region Faces
-		private val frontFace = floatArrayOf(
+		val frontFace = floatArrayOf(
 			-0.5f, -0.5f, 0.5f,
 			0.5f, -0.5f, 0.5f,
 			0.5f, 0.5f, 0.5f,
 			-0.5f, 0.5f, 0.5f
 		)
 
-		private val backFace = floatArrayOf(
+		val backFace = floatArrayOf(
 			// x   y    z
 			0.5f, -0.5f, -0.5f,
 			-0.5f, -0.5f, -0.5f,
@@ -74,28 +74,28 @@ abstract class Cube {
 			0.5f, 0.5f, -0.5f
 		)
 
-		private val topFace = floatArrayOf(
+		val topFace = floatArrayOf(
 			-0.5f, 0.5f, -0.5f,
 			-0.5f, 0.5f, 0.5f,
 			0.5f, 0.5f, 0.5f,
 			0.5f, 0.5f, -0.5f
 		)
 
-		private val bottomFace = floatArrayOf(
+		val bottomFace = floatArrayOf(
 			-0.5f, -0.5f, -0.5f,
 			0.5f, -0.5f, -0.5f,
 			0.5f, -0.5f, 0.5f,
 			-0.5f, -0.5f, 0.5f
 		)
 
-		private val rightFace = floatArrayOf(
+		val rightFace = floatArrayOf(
 			0.5f, -0.5f, 0.5f,
 			0.5f, -0.5f, -0.5f,
 			0.5f, 0.5f, -0.5f,
 			0.5f, 0.5f, 0.5f
 		)
 
-		private val leftFace = floatArrayOf(
+		val leftFace = floatArrayOf(
 			-0.5f, -0.5f, -0.5f,
 			-0.5f, -0.5f, 0.5f,
 			-0.5f, 0.5f, 0.5f,

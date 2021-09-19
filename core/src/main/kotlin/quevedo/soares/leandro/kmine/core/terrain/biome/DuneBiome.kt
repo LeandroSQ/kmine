@@ -5,10 +5,9 @@ import quevedo.soares.leandro.kmine.core.terrain.Chunk
 import quevedo.soares.leandro.kmine.core.terrain.Cube
 import quevedo.soares.leandro.kmine.core.terrain.Terrain
 import quevedo.soares.leandro.kmine.core.terrain.type.BedrockCube
-import quevedo.soares.leandro.kmine.core.terrain.type.DirtCube
-import quevedo.soares.leandro.kmine.core.terrain.type.GrassCube
+import quevedo.soares.leandro.kmine.core.terrain.type.SandCube
 
-class DefaultBiome(generator: Terrain) : Biome(generator) {
+class DuneBiome(generator: Terrain) : Biome(generator) {
 
 	override fun getHeightAt(x: Float, z: Float): Float {
 		val w = this.generator.width.toFloat()
@@ -19,8 +18,8 @@ class DefaultBiome(generator: Terrain) : Biome(generator) {
 		return this.simplexNoise.noise2D(
 			x = x / w,
 			z = z / d,
-			min = h / 2.5f,
-			max = h / 2f
+			min = h / 4f,
+			max = h / 2.7f
 		)
 	}
 
@@ -38,13 +37,11 @@ class DefaultBiome(generator: Terrain) : Biome(generator) {
 		if (bedrockLevel >= 1) strip.add(Chunk.EMPTY)
 		strip.add(BedrockCube())
 
-		// Fill with middle cubes
-		for (y in bedrockLevel + 1 until height - 1) {
-			strip.add(DirtCube())
-		}
 
-		// Appends the top cube
-		strip.add(GrassCube())
+		// Fill with middle cubes
+		for (y in bedrockLevel + 1 until height) {
+			strip.add(SandCube())
+		}
 
 		return strip
 	}

@@ -10,7 +10,7 @@ import ktx.math.vec3
 
 private const val FOV = 67f
 private const val SPEED = 8.25f
-private const val MOUSE_SENSITIVITY = 64f
+private const val MOUSE_SENSITIVITY = 64.1f
 private const val MAX_CAMERA_PITCH = 0.987f
 
 class Player {
@@ -35,8 +35,8 @@ class Player {
 			update()
 		}
 
-		val centerChunk = Game.world.chunks[Game.world.chunks.size / 2]
-		centerChunk.getHighest(centerChunk.width / 2, centerChunk.depth / 2)?.position?.cpy()?.let {
+		val chunk = Game.world.terrain.chunks.random()
+		chunk.getHighest(chunk.width / 2, chunk.depth / 2)?.position?.cpy()?.let {
 			this.position = it + Vector3.Y * 2
 		}
 	}
@@ -64,14 +64,14 @@ class Player {
 		val mouseY = -Gdx.input.getDeltaY(0)
 
 		if (mouseX != 0) {
-			this.camera.direction.rotate(camera.up, mouseX * sensitivity)
+			this.camera.direction.rotate(camera.up, mouseX.toFloat() * sensitivity)
 			isCameraDirty = true
 		}
 
 		if (mouseY != 0) {
 			val currentAngle = this.camera.direction.y
 			if (!(currentAngle < -MAX_CAMERA_PITCH && mouseY < 0) && !(currentAngle > MAX_CAMERA_PITCH && mouseY > 0)) {
-				this.camera.direction.rotate(this.camera.direction.cpy().crs(camera.up).nor(), mouseY * sensitivity)
+				this.camera.direction.rotate(this.camera.direction.cpy().crs(camera.up).nor(), mouseY.toFloat() * sensitivity)
 				isCameraDirty = true
 			}
 		}
@@ -88,7 +88,8 @@ class Player {
 	}
 
 	private fun handleKeyInput() {
-		val speed = SPEED * Gdx.graphics.deltaTime
+		val speed = SPEED * Gdx.graphics.deltaTime * if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) 3f else 1f
+
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			Gdx.input.isCursorCatched = false
@@ -125,7 +126,7 @@ class Player {
 			translateCamera(this.camera.up.cpy() * speed)
 		}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
 			translateCamera(this.camera.up.cpy() * -speed)
 		}
 	}
@@ -135,7 +136,6 @@ class Player {
 			val distance = target - current
 
 			val x = current + if (distance > step) step else if (distance < -step) -step else distance
-			if (x > 1f) println(x)
 			return x
 		}
 
