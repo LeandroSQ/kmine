@@ -13,6 +13,7 @@ import quevedo.soares.leandro.kmine.core.terrain.biome.DefaultBiome
 import quevedo.soares.leandro.kmine.core.terrain.biome.DuneBiome
 import quevedo.soares.leandro.kmine.core.utils.*
 import java.util.*
+import ktx.math.vec3
 
 private val SEED = Random().nextLong() + System.currentTimeMillis()
 
@@ -45,9 +46,9 @@ class Terrain {
 
 	private inline fun getBiomeAt(position: Vector3) = this.getBiomeAt(position.xInt, position.zInt)
 	private fun getBiomeAt(x: Int, z: Int): Biome {
-		return this.biomes.random()
+		return if (Math.floorMod(x / width  +  z / height, 2) == 0) biomes[0] else biomes[1]
 
-		// Calculates the divider, to scarse the x-z values
+		/*// Calculates the divider, to scarse the x-z values
 		// Therefore making the biome transitioning less often
 		val divider = (width * height * depth) / 3f
 
@@ -55,7 +56,7 @@ class Terrain {
 		val index = (this.openSimplexNoise.noise2D(x / divider, z / divider, min = 0f, max = biomes.size.toFloat()))
 
 		// Get the selected biome for the position
-		return this.biomes[clamp(index.toInt(), 0, this.biomes.size - 1)]
+		return this.biomes[clamp(index.toInt(), 0, this.biomes.size - 1)]*/
 	}
 
 	private fun getAdjacentChunks(chunk: Chunk): ArrayList<Chunk> {
@@ -88,6 +89,12 @@ class Terrain {
 		}
 	}
 
+	fun getChunkAt(x: Float, z: Float): Chunk? {
+		return this.chunks.find {
+			it.boundingBox.contains(vec3(x, 0f, z))
+		}
+	}
+
 	fun generateChunk(position: Vector3) {
 		// Fetch the biome for the chunk
 		val biome = this.getBiomeAt(position)
@@ -114,6 +121,7 @@ class Terrain {
 
 						// Set the cube strip to the chunk
 						cubeStrip.forEachIndexed { y, cube ->
+							cube?.position = vec3(x, y, z)
 							chunk.set(x, y, z, cube)
 						}
 					}

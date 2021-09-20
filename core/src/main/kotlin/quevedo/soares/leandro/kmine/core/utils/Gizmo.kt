@@ -61,14 +61,17 @@ object Gizmo {
 		this.box(boundingBox.min + dimensions / 2, boundingBox.max - dimensions / 2, color)
 	}
 
-	fun box(position: Vector3, size: Vector3, color: Color) {
+	fun box(position: Vector3, size: Vector3, color: Color, filled: Boolean = false, ignore: Boolean = false): ModelInstance {
 		val material = Material(ColorAttribute.createDiffuse(color))
 		val attributes = (VertexAttributes.Usage.Position or VertexAttributes.Usage.Normal or VertexAttributes.Usage.ColorPacked).toLong()
-		val model = ModelBuilder().createBox(size.x, size.y, size.z, GL20.GL_LINES, material, attributes)
-
-		this.models.add(ModelInstance(model).apply {
+		val primitive = if (filled) GL20.GL_TRIANGLES else GL20.GL_LINES
+		val model = ModelBuilder().createBox(size.x, size.y, size.z, primitive, material, attributes)
+		val instance = ModelInstance(model).apply {
 			transform.set(position, Quaternion())
-		})
+		}
+
+		if (!ignore) this.models.add(instance)
+		return instance
 	}
 
 	fun shpere(position: Vector3, radius: Float, color: Color, filled: Boolean = true) {

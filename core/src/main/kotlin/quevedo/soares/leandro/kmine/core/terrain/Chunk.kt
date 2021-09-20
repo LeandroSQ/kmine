@@ -88,9 +88,9 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	// endregion
 
 	inline fun getHighest(position: Vector3) = this.getHighest(position.xInt, position.zInt)
-	fun getHighest(x: Int, z: Int): Cube? {
-		for (y in 0 until this.height) {
-			val cube = this.get(x, this.height - y, z)
+	fun getHighest(x: Int, z: Int, yStart: Int = this.height - 1): Cube? {
+		for (y in 0 .. yStart) {
+			val cube = this.get(x, yStart - y, z)
 			if (cube !== EMPTY) return cube
 		}
 
