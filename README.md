@@ -60,7 +60,7 @@ And smoother camera movement
 
 ### Day 4
 To start, I just wanna share a video on how to project is going so far.
-![Day 4 - 0](./github/day4_0.mp4)
+![Day 4 - 0](./.github/day4_0.mp4)
 
 Basically I worked in rewriting the chunk system, but to made usage of the Renderable class
 This would allow me to apply shaders at the chunk mesh
@@ -73,6 +73,7 @@ After hours of work, managed to find the problem... Turns out that the mesh.numV
 therefore the mesh would simply render a part of the mesh
 ![Day 5 - 0](./.github/day5_0.png)
 Also added a Gizmo system to facilitate debugging
+Managed to consider the neighbor chunks while generating the mesh, therefore ignoring faces being occluded by them
 
 ### Day 6
 Resumed the work on the Physics engine, after successfully creating a tile based Y ground collision; I decided to move to [Bullet physics](https://pybullet.org/wordpress/index.php/forum-2/)
