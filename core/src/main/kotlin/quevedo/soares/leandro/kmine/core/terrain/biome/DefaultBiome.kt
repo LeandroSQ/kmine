@@ -1,6 +1,6 @@
 package quevedo.soares.leandro.kmine.core.terrain.biome
 
-import quevedo.soares.leandro.kmine.core.terrain.BiomeInfluence
+import quevedo.soares.leandro.kmine.core.models.BiomeInfluence
 import quevedo.soares.leandro.kmine.core.terrain.Chunk
 import quevedo.soares.leandro.kmine.core.terrain.Cube
 import quevedo.soares.leandro.kmine.core.terrain.Terrain

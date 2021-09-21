@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import ktx.math.*
+import quevedo.soares.leandro.kmine.core.Game
 import quevedo.soares.leandro.kmine.core.utils.vec3
 
 object Gizmo {
@@ -86,7 +87,7 @@ object Gizmo {
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {
-		this.models.forEach { modelBatch.render(it, environment) }
+		if (Game.isInDebugMode) this.models.forEach { modelBatch.render(it, environment) }
 	}
 
 	fun dispose() {

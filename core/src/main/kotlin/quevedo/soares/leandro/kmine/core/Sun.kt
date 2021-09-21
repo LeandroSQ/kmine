@@ -38,7 +38,7 @@ class Sun(environment: Environment) {
 
 		}
 
-		val arrowModel = Gizmo.line(Vector3.Zero, vec3(0f, 0f, 1.5f), Color.BLUE, true)
+		val arrowModel = Gizmo.line(Vector3(0f, 0f, 0f), vec3(0f, 0f, 1.5f), Color.BLUE, true)
 		this.arrow = ModelInstance(arrowModel).apply {
 			transform.position = modelInstance.transform.position
 		}

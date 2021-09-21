@@ -23,14 +23,12 @@ class World {
 
 	private lateinit var environment: Environment
 	private lateinit var modelBatch: ModelBatch
-	private lateinit var physics: Physics
 	private lateinit var sun: Sun
 	private lateinit var skybox: Skybox
 	lateinit var terrain: Terrain
 
 	// region Setup
 	fun onCreate() {
-		this.setupPhysics()
 		this.setupTerrain()
 		this.setupModel()
 		this.setupEnvironment()
@@ -40,14 +38,10 @@ class World {
 		this.testing()
 	}
 
-	private fun setupPhysics() {
-		this.physics = Physics()
-		this.physics.init()
-	}
-
 	private fun setupTerrain() {
 		this.terrain = Terrain()
 		this.terrain.create()
+		this.terrain.generateBatch(10)
 	}
 
 	private fun setupEnvironment() {
@@ -65,7 +59,7 @@ class World {
 	}
 
 	private fun testing() {
-		var maxPos = Vector3.Zero
+		var maxPos = Vector3(0f, 0f, 0f)
 		var maxChunk: Chunk? = null
 
 		for (chunk in this.terrain.chunks) {
@@ -95,11 +89,8 @@ class World {
 
 	}
 
-
 	private fun setupModel() {
 		this.modelBatch = ModelBatch()
-
-		terrain.generateBatch(10)
 
 		Gizmo.grid(Vector3(-0.5f, -0.5f, -0.5f), 16f, 20, Color(1f, 0.2f, 0.2f, 1f))
 
@@ -134,8 +125,6 @@ class World {
 	}
 
 	fun render() {
-		this.physics.update()
-
 		// Render Gizmos
 		Gizmo.render(this.modelBatch, this.environment)
 
@@ -151,13 +140,17 @@ class World {
 			Gdx.gl.glDisable(GL20.GL_CULL_FACE)
 			Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
 		}
+
+		this.terrain.chunks.filter { it.isDirty }.forEach {
+			it.generateMesh()
+			it.neighbors.forEach { neighbor -> neighbor.generateMesh() }
+		}
 	}
 
 	fun dispose() {
 		Gizmo.dispose()
 		this.modelBatch.dispose()
 		this.terrain.dispose()
-		this.physics.dispose()
 		Cube.disposeTextures()
 	}
 

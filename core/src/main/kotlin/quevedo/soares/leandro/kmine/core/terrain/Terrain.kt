@@ -14,17 +14,9 @@ import quevedo.soares.leandro.kmine.core.terrain.biome.DuneBiome
 import quevedo.soares.leandro.kmine.core.utils.*
 import java.util.*
 import ktx.math.vec3
+import quevedo.soares.leandro.kmine.core.models.BiomeInfluence
 
 private val SEED = Random().nextLong() + System.currentTimeMillis()
-
-data class BiomeInfluence(
-	val biome: Biome,
-	val influence: Float
-) {
-
-	override fun toString() = "${biome.name} - ${influence}"
-
-}
 
 @Suppress("NOTHING_TO_INLINE")
 class Terrain {
@@ -133,15 +125,13 @@ class Terrain {
 		this.chunks.add(chunk)
 	}
 
-	fun generateBatch(count: Int, origin: Vector3 = Vector3.Zero) = runBlocking {
+	fun generateBatch(count: Int, origin: Vector3 = Vector3(0f, 0f, 0f)) {
 		/*generateChunk(origin + vec3(0 * width, 0, 0 * depth))
 		generateChunk(origin + vec3(1 * width, 0, 0 * depth))*/
 
 		for (x in 0 until count) {
 			for (z in 0 until count) {
-				//launch {
-					generateChunk(origin + vec3(x * width, 0, z * depth))
-				//}
+				generateChunk(origin + vec3(x * width, 0, z * depth))
 			}
 		}
 	}

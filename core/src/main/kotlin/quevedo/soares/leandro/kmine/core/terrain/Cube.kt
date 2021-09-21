@@ -9,7 +9,7 @@ import quevedo.soares.leandro.kmine.core.models.CubeFaceTextureMap
 abstract class Cube {
 
 	open val size = 0.5f
-	open var position: Vector3 = Vector3.Zero
+	open var position: Vector3 = Vector3(0f, 0f, 0f)
 	var chunk: Chunk? = null
 
 	open lateinit var textureMap: CubeFaceTextureMap

@@ -6,23 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.HdpiMode
 import quevedo.soares.leandro.kmine.core.Game
 
-
 object DesktopLauncher {
-
-	/**
-	 * workaround for Mac
-	 */
-	/*private fun setApplicationIcon() {
-		try {
-			val cls = Class.forName("com.apple.eawt.Application")
-			val application = cls.newInstance().javaClass.getMethod("getApplication").invoke(null)
-			val icon = Gdx.files.local("icons/icon.png")
-			application.javaClass.getMethod("setDockIconImage", Image::class.java)
-				.invoke(application, ImageIcon(icon.file().absolutePath).image)
-		} catch (e: Exception) {
-			// nobody cares!
-		}
-	}*/
 
 	@JvmStatic
 	fun main(args: Array<String>) {

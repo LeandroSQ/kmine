@@ -5,34 +5,40 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.PerspectiveCamera
 import com.badlogic.gdx.graphics.g3d.ModelInstance
+import com.badlogic.gdx.math.MathUtils.floor
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
+import ktx.math.div
 import ktx.math.minus
+import ktx.math.vec3
 import ktx.math.plus
 import ktx.math.times
-import ktx.math.vec3
+import quevedo.soares.leandro.kmine.core.models.PlayerPhysicsProperties
 import quevedo.soares.leandro.kmine.core.terrain.Chunk
+import quevedo.soares.leandro.kmine.core.terrain.type.TorchCube
 import quevedo.soares.leandro.kmine.core.utils.*
 
 private const val FOV = 67f
-private const val SPEED = 8.25f
+private const val SPEED = 4.25f
 private const val MOUSE_SENSITIVITY = 64.1f
 private const val MAX_CAMERA_PITCH = 0.987f
-private const val GRAVITY_FORCE = 9.80665f
-private const val AIR_FRICTION = 0.9f
-private const val JUMP_FORCE = GRAVITY_FORCE * 2f
 
 class Player {
 
-	val height = 2f
+	lateinit var physics: PlayerPhysicsProperties
+		private set
 
-	var isFlying = true
-	var isGrounded = false
+	val dimensions = vec3(1, 2, 1)
 
-	var speed: Vector3 = Vector3.Zero
-
+	var velocity = Vector3(0f, 0f, 0f)
 	var position: Vector3
 		get() = this.camera.position
-		set(value) { camera.position.set(value) }
+		set(value) {
+			camera.position.set(value)
+		}
+
+	val transform: Matrix4
+		get() = this.camera.projection
 
 	private var isCameraDirty = false
 
@@ -41,27 +47,33 @@ class Player {
 	lateinit var camera: PerspectiveCamera
 		private set
 
-	private lateinit var debugCube: ModelInstance
+	lateinit var cubeOutline : ModelInstance
 
 	fun onCreate() {
 		Gdx.input.isCursorCatched = true
 
+		// Creates the camera
 		this.camera = PerspectiveCamera(FOV, Gdx.graphics.width * Gdx.graphics.density, Gdx.graphics.height * Gdx.graphics.density).apply {
-			near = 0.5f
+			near = 0.1f
 			far = 300f
 			update()
 		}
 
+		// Positions the player
 		val chunk = Game.world.terrain.chunks.random()
-		chunk.getHighest(chunk.width / 2, chunk.depth / 2)?.position?.cpy()?.let {
-			this.position = it + Vector3.Y * 2
+		chunk.getHighest(floor(chunk.width / 2f), floor(chunk.depth / 2f))?.let {
+			this.position = chunk.position + it.position + Vector3.Y * dimensions.y * 10
 		}
 
-		this.debugCube = Gizmo.box(this.position, vec3(1f, 1f, 1f), Color(1f, 1f, 0f, 0.2f), filled = true)
+		this.setupPhysicsProperties()
+
+		cubeOutline = Gizmo.box(Vector3(0f, 0f, 0f), vec3(1.05f, 1.05f,1.05f), Color.BLACK, filled = false)
 	}
 
-	private fun getChunkBasedOnPosition(): Chunk? {
-		return Game.world.terrain.getChunkAt(this.position.x, this.position.z)
+	private fun setupPhysicsProperties() {
+		this.physics = PlayerPhysicsProperties(this.dimensions, this.position).apply {
+			Game.physics.add(this)
+		}
 	}
 
 	private fun translateCamera(direction: Vector3) {
@@ -78,6 +90,40 @@ class Player {
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			Gdx.app.exit()
+		}
+	}
+
+	private fun onPlaceCube(position: Vector3) {
+		Game.world.terrain.getChunkAt(position.x, position.z)?.let { chunk ->
+			val relativeHitPosition = position - chunk.position
+			chunk.set(relativeHitPosition, Chunk.EMPTY)
+		}
+	}
+
+	private fun onBreakCube(position: Vector3) {
+		Game.world.terrain.getChunkAt(position.x, position.z)?.let { chunk ->
+			val relativeHitPosition = position - chunk.position
+			chunk.set(relativeHitPosition, TorchCube())
+		}
+	}
+
+	private fun handleRayCasting() {
+		val pickRay = this.camera.getPickRay(Gdx.graphics.width / 2f, Gdx.graphics.height / 2f)
+		val from = pickRay.origin
+		val to = pickRay.direction.scl(5f).add(from)
+
+		val hit = Game.physics.castRay(from, to)
+
+		if (hit != null) {
+			this.cubeOutline.transform.position = hit.negative
+
+			if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+				onPlaceCube(hit.negative)
+			} else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+				onBreakCube(hit.positive)
+			}
+		} else {
+			cubeOutline.transform.position = vec3(0f, 0f, 0f)
 		}
 	}
 
@@ -98,24 +144,12 @@ class Player {
 				isCameraDirty = true
 			}
 		}
-
-		// TODO: Cube ray casting
-		/*if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-			val origin = this.camera.position.cpy()
-			val target = origin + (this.camera.direction.cpy() * 50f)
-
-			val callback = ClosestRayResultCallback(origin, target)
-			callback.collisionObject = null
-			callback.closestHitFraction = 1f
-		}*/
 	}
 
 	private fun handleKeyInput() {
-		val speed = SPEED * Gdx.graphics.deltaTime * if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) 3f else 1f
-
-		if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-			this.isFlying = !this.isFlying
-		}
+		val speedMultiplier = if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) 3f else 1f
+		val speed = SPEED * Gdx.graphics.deltaTime * speedMultiplier
+		this.velocity = Vector3(0f, 0f, 0f)
 
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			Gdx.input.isCursorCatched = false
@@ -133,38 +167,32 @@ class Player {
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * -speed)
+			this.velocity += camera.direction.cpy().crs(camera.up).nor() * -speed * vec3(1, 0, 1)
+			isCameraDirty = true
+			//translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * -speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * speed)
+			this.velocity += camera.direction.cpy().crs(camera.up).nor() * speed * vec3(1, 0, 1)
+			isCameraDirty = true
+			//translateCamera(this.camera.direction.cpy().crs(camera.up).nor() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
-			if (!this.isFlying) {
-				this.getChunkBasedOnPosition()?.let { chunk ->
-					val relativePosition = this.position - chunk.position
-					val cubesBlockingWalkDirection = chunk.isEmpty(relativePosition.xInt, relativePosition.yInt + 1, relativePosition.zInt + 1) && chunk.isEmpty(relativePosition.xInt, relativePosition.yInt + 2, relativePosition.zInt + 1)
-					if (cubesBlockingWalkDirection) translateCamera(this.camera.direction.cpy() * speed)
-				} ?: run {
-					translateCamera(this.camera.direction.cpy() * speed)
-				}
-			} else {
-				translateCamera(this.camera.direction.cpy() * speed)
-			}
+			this.velocity += this.camera.direction.cpy() * speed * vec3(1, 0, 1)
+			isCameraDirty = true
+			//translateCamera(this.camera.direction.cpy() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
-			translateCamera(this.camera.direction.cpy() * -speed)
+			this.velocity += this.camera.direction.cpy() * -speed * vec3(1, 0, 1)
+			isCameraDirty = true
+			//translateCamera(this.camera.direction.cpy() * -speed)
 		}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-			if (!this.isFlying && this.isGrounded) {
-				this.speed.y += JUMP_FORCE
-				this.isGrounded = false
-			} else if (this.isFlying) {
-				translateCamera(this.camera.up.cpy() * speed)
-			}
+		if (this.physics.controller.canJump() && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+			this.velocity += this.camera.up
+			//translateCamera(this.camera.up.cpy() * speed)
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT)) {
@@ -172,37 +200,16 @@ class Player {
 		}
 	}
 
-	private fun handlePhysics() {
-		if (!this.isGrounded) {
-			this.position.y -= GRAVITY_FORCE * Gdx.graphics.deltaTime
-			this.position.y += this.speed.y * Gdx.graphics.deltaTime
-			this.speed.y *= AIR_FRICTION
-
-			this.isCameraDirty = true
-		}
-
-		// 1- Find the chunk of which the player is in
-		val chunk = this.getChunkBasedOnPosition() ?: return
-
-		// 2- Get the surface cube at the player position x and z
-		val relativePosition = this.position - chunk.position
-		val cube = chunk.getHighest(relativePosition.xInt, relativePosition.zInt, yStart = relativePosition.yInt + 1) ?: return
-
-		// 3- Collision response
-		val min = cube.position.y + chunk.position.y + cube.size + this.height
-		if (this.position.y <= min) {
-			this.position.y = min
-			this.isGrounded = true
-			this.isCameraDirty = true
-		} else {
-			this.isGrounded = false
-		}
-	}
-
 	fun update() {
-		if (!this.isFlying) this.handlePhysics()
+		if (!this.position.epsilonEquals(physics.ghostObject.worldTransform.position)) {
+			isCameraDirty = true
+			this.position = physics.ghostObject.worldTransform.position + camera.up * dimensions.y / 1.5f
+		}
+
+		this.physics.controller.setWalkDirection(this.velocity)
 
 		if (this.isCapturingInput) {
+			this.handleRayCasting()
 			this.handleMouseInput()
 
 			this.handleKeyInput()
@@ -217,7 +224,7 @@ class Player {
 	}
 
 	fun dispose() {
-
+		this.physics.dispose()
 	}
 
 	fun onResize(width: Float, height: Float) {

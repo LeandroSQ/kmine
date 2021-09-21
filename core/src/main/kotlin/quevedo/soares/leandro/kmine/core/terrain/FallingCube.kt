@@ -50,7 +50,7 @@ open class FallingCube {
 		motionState.setWorldTransform(transform)
 
 		// Calculate local inertia
-		val dynamicInertia = Vector3.Zero
+		val dynamicInertia = Vector3(0f, 0f, 0f)
 		collisionObject?.collisionShape?.calculateLocalInertia(mass, dynamicInertia)
 
 		// Create rigid body
@@ -61,7 +61,7 @@ open class FallingCube {
 			restitution = 0f
 			setDamping(0.9f, 0.9f)
 			linearFactor = Vector3(1f, 1f, 1f)
-			angularFactor = Vector3.Zero
+			angularFactor = Vector3(0f, 0f, 0f)
 			contactCallbackFlag = 2
 			contactCallbackFilter = 2
 		}

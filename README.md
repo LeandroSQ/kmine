@@ -73,3 +73,8 @@ After hours of work, managed to find the problem... Turns out that the mesh.numV
 therefore the mesh would simply render a part of the mesh
 ![Day 5 - 0](./.github/day5_0.png)
 Also added a Gizmo system to facilitate debugging
+
+### Day 6
+Resumed the work on the Physics engine, after successfully creating a tile based Y ground collision; I decided to move to [Bullet physics](https://pybullet.org/wordpress/index.php/forum-2/)
+After many and many bugs, managed to make it work with the player.
+After that I've made a simple raycast system and created the system to allow player to break and place cubes

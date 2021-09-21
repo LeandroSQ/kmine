@@ -15,6 +15,8 @@ import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.enums.CubeTexture
 import kotlin.math.sqrt
 
+fun Vector3.floor() = vec3(xInt, yInt, zInt)
+
 operator fun FloatArray.times(size: Float) = this.map { it * size }.toFloatArray()
 
 inline var Matrix4.position: Vector3

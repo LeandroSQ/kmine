@@ -14,10 +14,13 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
+import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape
+import com.badlogic.gdx.utils.Array
 import ktx.math.div
 import ktx.math.plus
+import quevedo.soares.leandro.kmine.core.Game
+import quevedo.soares.leandro.kmine.core.Physics
 import quevedo.soares.leandro.kmine.core.enums.CubeFace
-import quevedo.soares.leandro.kmine.core.enums.CubeTexture
 import quevedo.soares.leandro.kmine.core.models.PhysicsProperties
 import quevedo.soares.leandro.kmine.core.shader.MeshShader
 import quevedo.soares.leandro.kmine.core.terrain.biome.Biome
@@ -78,6 +81,8 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 
 	inline fun set(position: Vector3, cube: Cube?) = this.set(position.xInt, position.yInt, position.zInt, cube)
 	fun set(x: Int, y: Int, z: Int, cube: Cube?) {
+		if (x < 0 || y < 0 || z < 0 || x >= width || y >= height || z >= depth) return
+
 		this.cubes.set(x, y, z, cube)
 		this.isDirty = true
 	}
@@ -150,9 +155,11 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 
 	private fun createPhysicsProperties() {
 		// Defines the collision shape to be the generated mesh
-		//val shape = btBvhTriangleMeshShape(Array.with(renderable!!.meshPart))
+		val shape = btBvhTriangleMeshShape(Array.with(renderable!!.meshPart))
 		// Creates a physics wrapper
-		//this.physics = PhysicsProperties(shape, transform, mass = 1f)
+		this.physics = PhysicsProperties(shape, isStatic = true, this.position, mass = 0f).apply {
+			Game.physics.add(this)
+		}
 	}
 
 	private fun createRenderable(mesh: MeshPart) {
@@ -168,6 +175,8 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	}
 
 	fun generateMesh() {
+		this.dispose()
+
 		var verticesCount = 0
 
 		val builder = MeshBuilder()
@@ -233,9 +242,10 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	}
 
 	fun dispose() {
-		this.cubes.clear()
 		this.renderable?.meshPart?.mesh?.dispose()
-		this.renderable?.shader?.dispose()
+		this.renderable?.meshPart?.mesh = null
+		this.renderable = null
+
 		this.physics?.dispose()
 	}
 
