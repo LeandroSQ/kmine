@@ -10,10 +10,13 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.math.vec2
+import quevedo.soares.leandro.kmine.core.models.FixedSizeCircularQueue
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
+import quevedo.soares.leandro.kmine.core.utils.clamp
+import quevedo.soares.leandro.kmine.core.utils.humanFriendlyFormat
 import quevedo.soares.leandro.kmine.core.utils.use
-import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.min
 
 private val FONT_SIZE = 46f * Gdx.graphics.density
 
@@ -27,6 +30,8 @@ class HUD {
 	private val width get() = this.camera.viewportWidth
 	private val height get() = this.camera.viewportHeight
 
+	val frameTimeQueue = FixedSizeCircularQueue(240)
+
 	private var line = 0
 
 	fun onCreate() {
@@ -38,7 +43,7 @@ class HUD {
 
 	private fun renderText(text: String) {
 		val padding = 10f
-		this.font.draw(this.spriteBatch, text, padding, height - padding - font.lineHeight * (line ++))
+		this.font.draw(this.spriteBatch, text, padding, height - padding - font.lineHeight * (line++))
 	}
 
 	private fun createFont() {
@@ -83,6 +88,8 @@ class HUD {
 		val centerY = height / 2f
 
 		this.shapeRenderer.use {
+			this.shapeRenderer.color = Color.WHITE
+
 			// Horizontal line
 			this.shapeRenderer.rectLine(
 				vec2(centerX - size, centerY),
@@ -114,39 +121,33 @@ class HUD {
 		val used = runtime.totalMemory() - runtime.freeMemory()
 
 		this.renderText("FPS: ${Gdx.graphics.framesPerSecond}")
-		this.renderText( "Memory: ${formatSize(max(javaHeap, used))}B")
-	}
-
-	fun formatSize(v: Int) = this.formatSize(v.toLong())
-	fun formatSize(bytes: Long): String {
-		val unit = 1000.0
-		if (bytes < unit)
-			return "$bytes"
-		var result = bytes.toDouble()
-		val unitsToUse = "KMGTPE"
-		var i = 0
-		val unitsCount = unitsToUse.length
-		while (true) {
-			result /= unit
-			if (result < unit || i == unitsCount - 1)
-				break
-			++i
-		}
-		return with(StringBuilder(9)) {
-			append(String.format("%.1f ", result))
-			append(unitsToUse[i])
-		}.toString()
+		this.renderText("Memory: ${max(javaHeap, used).humanFriendlyFormat()}B")
 	}
 
 	private fun renderStatistics() {
 		Game.world.calculateStatistics().let {
-			this.renderText("Vertices: ${formatSize(it.visibleVerticesCount)} / ${formatSize(it.totalVerticesCount)}")
-			this.renderText("Indices: ${formatSize(it.visibleIndicesCount)} / ${formatSize(it.totalIndicesCount)}")
+			this.renderText("Vertices: ${it.visibleVerticesCount.humanFriendlyFormat()} / ${it.totalVerticesCount.humanFriendlyFormat()}")
+			this.renderText("Indices: ${it.visibleIndicesCount.humanFriendlyFormat()} / ${it.totalIndicesCount.humanFriendlyFormat()}")
 			this.renderText("Chunks: ${it.visibleChunksCount} / ${it.totalChunksCount}")
 		}
 
 		Game.player.position.let {
 			this.renderText("Player: { %.2f, %.2f, %.2f }".format(it.x, it.y, it.z))
+		}
+	}
+
+	@OptIn(ExperimentalUnsignedTypes::class)
+	private fun renderFrameTimeGraph() {
+		this.shapeRenderer.use {
+			val barSize = this.camera.viewportWidth / this.frameTimeQueue.size.toFloat()
+			val max = clamp(this.frameTimeQueue.max.toInt(), 0, 200) / 400f
+
+			this.shapeRenderer.color = Color(max + 0.5f, 1f - max, 0f, 0.9f)
+			this.frameTimeQueue.forEach { index, item ->
+				this.shapeRenderer.rect(
+					barSize * index, 0f, barSize, (item / 10f) * 15f
+				)
+			}
 		}
 	}
 
@@ -157,13 +158,18 @@ class HUD {
 
 		this.line = 0
 
-		this.spriteBatch.begin()
-		this.renderCrosshair()
-		this.renderFpsCounter()
-		this.renderStatistics()
-		this.spriteBatch.end()
+		this.spriteBatch.use {
+			this.renderCrosshair()
 
-		Gdx.gl20.glDisable(GL20.GL_BLEND)
+			Gdx.gl20.glDisable(GL20.GL_BLEND)
+
+			this.renderFpsCounter()
+
+			if (Game.isInDebugMode) {
+				this.renderStatistics()
+				this.renderFrameTimeGraph()
+			}
+		}
 	}
 
 	fun dispose() {

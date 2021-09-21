@@ -19,10 +19,8 @@ import com.badlogic.gdx.utils.Array
 import ktx.math.div
 import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.Game
-import quevedo.soares.leandro.kmine.core.Physics
 import quevedo.soares.leandro.kmine.core.enums.CubeFace
 import quevedo.soares.leandro.kmine.core.models.PhysicsProperties
-import quevedo.soares.leandro.kmine.core.shader.MeshShader
 import quevedo.soares.leandro.kmine.core.terrain.biome.Biome
 import quevedo.soares.leandro.kmine.core.utils.*
 
@@ -32,8 +30,6 @@ private const val MESH_ATTRIBUTES = (VertexAttributes.Usage.Position or VertexAt
 class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height: Int, val depth: Int) {
 
 	var neighbors = arrayListOf<Chunk>()
-
-	private lateinit var shader: MeshShader
 
 	var cubes: CubeMatrix
 		private set
@@ -94,7 +90,7 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 
 	inline fun getHighest(position: Vector3) = this.getHighest(position.xInt, position.zInt)
 	fun getHighest(x: Int, z: Int, yStart: Int = this.height - 1): Cube? {
-		for (y in 0 .. yStart) {
+		for (y in 0..yStart) {
 			val cube = this.get(x, yStart - y, z)
 			if (cube !== EMPTY) return cube
 		}
@@ -175,6 +171,7 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	}
 
 	fun generateMesh() {
+		// Dispose previously created assets, if any
 		this.dispose()
 
 		var verticesCount = 0
@@ -188,7 +185,7 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 		val leftNeighbor = this.getNeighborAt(-1, 0)
 		val rightNeighbor = this.getNeighborAt(1, 0)
 
-		this.cubes.forEach { x, y, z, cube ->
+		cubes.forEach { x, y, z, cube ->
 			// Ignore empty cubes
 			if (cube == EMPTY) return@forEach
 
@@ -196,25 +193,27 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 			val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
 			// Append the faces
-			if (shouldDrawFace(x, y + 1, z)) verticesCount += addFace(builder, cube, offset, CubeFace.TOP)
-			if (shouldDrawFace(x, y - 1, z)) verticesCount += addFace(builder, cube, offset, CubeFace.BOTTOM)
+			if (cube.isTranslucent || (shouldDrawFace(x, y + 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.TOP)
+			if (cube.isTranslucent || (shouldDrawFace(x, y - 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.BOTTOM)
 
 			// Left
-			if (shouldDrawFace(x - 1, y, z) && !isNeighborLeftOccluding(leftNeighbor, x, y, z))
+			if (cube.isTranslucent || (shouldDrawFace(x - 1, y, z) && !isNeighborLeftOccluding(leftNeighbor, x, y, z)))
 				verticesCount += addFace(builder, cube, offset, CubeFace.LEFT)
 
 			// Right
-			if (shouldDrawFace(x + 1, y, z) && !isNeighborRightOccluding(rightNeighbor, x, y, z))
+			if (cube.isTranslucent || (shouldDrawFace(x + 1, y, z) && !isNeighborRightOccluding(rightNeighbor, x, y, z)))
 				verticesCount += addFace(builder, cube, offset, CubeFace.RIGHT)
 
 			// Front
-			if (shouldDrawFace(x, y, z + 1) && !isNeighborFrontOccluding(frontNeighbor, x, y, z))
+			if (cube.isTranslucent || (shouldDrawFace(x, y, z + 1) && !isNeighborFrontOccluding(frontNeighbor, x, y, z)))
 				verticesCount += addFace(builder, cube, offset, CubeFace.FRONT)
 
 			// Back
-			if (shouldDrawFace(x, y, z - 1) && !isNeighborBackOccluding(backNeighbor, x, y, z))
+			if (cube.isTranslucent || (shouldDrawFace(x, y, z - 1) && !isNeighborBackOccluding(backNeighbor, x, y, z)))
 				verticesCount += addFace(builder, cube, offset, CubeFace.BACK)
+
 		}
+
 
 		val mesh = builder.end()
 		// For some reason, the vertices count need to be divided by 2

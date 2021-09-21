@@ -128,6 +128,8 @@ class World {
 		// Render Gizmos
 		Gizmo.render(this.modelBatch, this.environment)
 
+		this.terrain.update()
+
 		this.modelBatch.use(Game.player.camera) {
 			this.skybox.render(this.modelBatch)
 
@@ -139,11 +141,6 @@ class World {
 
 			Gdx.gl.glDisable(GL20.GL_CULL_FACE)
 			Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
-		}
-
-		this.terrain.chunks.filter { it.isDirty }.forEach {
-			it.generateMesh()
-			it.neighbors.forEach { neighbor -> neighbor.generateMesh() }
 		}
 	}
 

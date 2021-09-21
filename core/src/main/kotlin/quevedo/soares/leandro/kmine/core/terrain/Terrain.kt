@@ -3,6 +3,8 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.math.Vector3
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import ktx.math.div
@@ -141,10 +143,25 @@ class Terrain {
 		this.biomes.clear()
 	}
 
-	fun render(modelBatch: ModelBatch, environment: Environment) {
-		this.chunks.forEach {
-			it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
-			if (it.isVisible) it.render(modelBatch, environment)
+	fun render(modelBatch: ModelBatch, environment: Environment) = runBlocking {
+		chunks.forEach {
+			launch {
+				it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
+				if (it.isVisible) it.render(modelBatch, environment)
+			}
+		}
+	}
+
+	fun update() {
+		chunks.forEach {
+			// If the mesh was changed
+			if (it.isDirty) {
+				// Re-generate the chunk's mesh
+				it.generateMesh()
+
+				// Re-generate the chunk's neighbors meshes
+				it.neighbors.forEach { neighbor -> neighbor.generateMesh() }
+			}
 		}
 	}
 

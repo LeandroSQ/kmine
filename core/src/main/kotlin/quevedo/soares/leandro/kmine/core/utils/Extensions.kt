@@ -2,6 +2,7 @@ package quevedo.soares.leandro.kmine.core.utils
 
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.Model
@@ -14,6 +15,29 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import quevedo.soares.leandro.kmine.core.enums.CubeTexture
 import kotlin.math.sqrt
+
+fun clamp(x: Float, min: Float, max: Float) = if (x > max) max else if (x < min) min else x
+
+fun Int.humanFriendlyFormat() = this.toLong().humanFriendlyFormat()
+fun Long.humanFriendlyFormat(): String {
+	val unit = 1000.0
+	if (this < unit)
+		return "$this"
+	var result = this.toDouble()
+	val unitsToUse = "KMGTPE"
+	var i = 0
+	val unitsCount = unitsToUse.length
+	while (true) {
+		result /= unit
+		if (result < unit || i == unitsCount - 1)
+			break
+		++i
+	}
+	return with(StringBuilder(9)) {
+		append(String.format("%.1f ", result))
+		append(unitsToUse[i])
+	}.toString()
+}
 
 fun Vector3.floor() = vec3(xInt, yInt, zInt)
 
@@ -44,6 +68,12 @@ fun ModelBuilder.createQuad(size: Float, material: Material, attributes: Long): 
 
 fun ModelBatch.use(camera: Camera, callback: () -> Unit) {
 	this.begin(camera)
+	callback.invoke()
+	this.end()
+}
+
+fun SpriteBatch.use(callback: () -> Unit) {
+	this.begin()
 	callback.invoke()
 	this.end()
 }
