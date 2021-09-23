@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.physics.bullet.Bullet
+import ktx.async.KtxAsync
 import quevedo.soares.leandro.kmine.core.player.Player
 import quevedo.soares.leandro.kmine.core.terrain.Cube
 
@@ -30,6 +31,7 @@ object Game : ApplicationAdapter() {
 
 	override fun create() {
 		Bullet.init()
+		KtxAsync.initiate()
 		Cube.loadTextures()
 
 		this.physics.onCreate()

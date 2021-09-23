@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape
 import com.badlogic.gdx.utils.Array
+import ktx.async.onRenderingThread
 import ktx.math.div
 import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.Game
@@ -169,10 +170,8 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 		this.createPhysicsProperties()
 	}
 
-	fun generateMesh() {
-		// Dispose previously created assets, if any
-		this.dispose()
-
+	suspend fun generateMesh() {
+		isDirty = false
 		var verticesCount = 0
 
 		val builder = MeshBuilder()
@@ -213,21 +212,23 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 
 		}
 
+		onRenderingThread {
+			val mesh = builder.end()
+			// For some reason, the vertices count need to be divided by 2
+			// And using mesh.numVertices simply doesn't work
+			val meshPart = MeshPart("mesh", mesh, 0, verticesCount / 2, GL20.GL_TRIANGLES)
 
-		val mesh = builder.end()
-		// For some reason, the vertices count need to be divided by 2
-		// And using mesh.numVertices simply doesn't work
-		val meshPart = MeshPart("mesh", mesh, 0, verticesCount / 2, GL20.GL_TRIANGLES)
+			// Stores the mesh attributes
+			this@Chunk.verticesCount = verticesCount
+			this@Chunk.indicesCount = verticesCount * 3
+			this@Chunk.boundingBox = mesh.calculateBoundingBox().mul(Matrix4().setToTranslation(position))
 
-		// Stores the mesh attributes
-		verticesCount = verticesCount
-		indicesCount = verticesCount * 3
-		boundingBox = mesh.calculateBoundingBox().mul(Matrix4().setToTranslation(position))
+			// Dispose previously created assets, if any
+			dispose()
 
-		// Creates the renderable based on the generated mesh
-		createRenderable(meshPart)
-
-		isDirty = false
+			// Creates the renderable based on the generated mesh
+			createRenderable(meshPart)
+		}
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {

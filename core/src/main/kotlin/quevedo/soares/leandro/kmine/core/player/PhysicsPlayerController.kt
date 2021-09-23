@@ -117,7 +117,7 @@ class PhysicsPlayerController(private val player: Player) : BasePlayerController
 			this.translate(this.player.camera.direction.cpy() * -speed)
 		}
 
-		if (this.physics.controller.canJump() && Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+		if (this.physics.controller.canJump() && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 			this.player.isCameraDirty = true
 			this.velocity += this.player.camera.up * AIR_FRICTION
 		}

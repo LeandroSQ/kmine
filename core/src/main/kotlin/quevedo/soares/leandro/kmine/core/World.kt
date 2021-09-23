@@ -58,33 +58,33 @@ class World {
 	}
 
 	private fun testing() {
-		var maxPos = Vector3(0f, 0f, 0f)
-		var maxChunk: Chunk? = null
-
-		for (chunk in this.terrain.chunks) {
-			for (x in 0 until chunk.width) {
-				for (z in 0 until chunk.depth) {
-					chunk.getHighest(x, z)?.position?.let { pos ->
-						if (pos.y > maxPos.y) {
-							maxPos = pos
-							maxChunk = chunk
-						}
-					}
-				}
-			}
-		}
+//		var maxPos = Vector3(0f, 0f, 0f)
+//		var maxChunk: Chunk? = null
+//
+//		for (chunk in this.terrain.chunks) {
+//			for (x in 0 until chunk.width) {
+//				for (z in 0 until chunk.depth) {
+//					chunk.getHighest(x, z)?.position?.let { pos ->
+//						if (pos.y > maxPos.y) {
+//							maxPos = pos
+//							maxChunk = chunk
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		// Appends a furnace in the middle of the map
-		maxChunk?.let {
-			val pos = maxPos + vec3(0, 1, 0)
-			it.set(pos, TorchCube())
-			it.generateMesh()
-			environment.add(PointLight().apply {
-				position.set(pos + it.position + vec3(0f, 1.75f, 0f))
-				color.set(Color.CORAL)
-				intensity = 5f
-			})
-		}
+//		maxChunk?.let {
+//			val pos = maxPos + vec3(0, 1, 0)
+//			it.set(pos, TorchCube())
+//			it.generateMesh()
+//			environment.add(PointLight().apply {
+//				position.set(pos + it.position + vec3(0f, 1.75f, 0f))
+//				color.set(Color.CORAL)
+//				intensity = 5f
+//			})
+//		}
 
 	}
 
@@ -131,6 +131,7 @@ class World {
 			this.skybox.render(this.modelBatch)
 
 			Gdx.gl.glEnable(GL20.GL_CULL_FACE)
+			Gdx.gl.glCullFace(GL20.GL_BACK)
 			Gdx.gl.glEnable(GL20.GL_DEPTH_TEST)
 
 			this.sun.render(this.modelBatch)

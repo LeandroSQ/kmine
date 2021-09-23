@@ -3,6 +3,9 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.math.Vector3
+import kotlinx.coroutines.*
+import ktx.async.KtxAsync
+import ktx.async.newAsyncContext
 import ktx.math.div
 import ktx.math.plus
 import ktx.math.vec3
@@ -24,6 +27,8 @@ class Terrain {
 	val height = 64
 	val depth = 16
 	val chunks = arrayListOf<Chunk>()
+
+	private val meshingContext = newAsyncContext(2, "TerrainMeshing-Thread")
 
 	internal lateinit var openSimplexNoise: OpenSimplexNoise
 
@@ -121,17 +126,25 @@ class Terrain {
 	}
 
 	fun generateBatch(count: Int, origin: Vector3 = Vector3(0f, 0f, 0f)) {
-		measureTimeMillis {
-			for (x in 0 until count) {
-				for (z in 0 until count) {
-					generateChunk(origin + vec3(x * width, 0, z * depth))
+		KtxAsync.launch {
+			measureTimeMillis {
+				val list = arrayListOf<Deferred<Unit>>()
+				for (x in 0 until count) {
+					for (z in 0 until count) {
+						list.add(KtxAsync.async {
+							generateChunk(origin + vec3(x * width, 0, z * depth))
+						})
+					}
 				}
+				list.awaitAll()
+			}.also { elapsed ->
+				println("Initial terrain generation of ${count * count} chunks took ${elapsed}ms")
 			}
-		}.also { elapsed ->
-			println("Initial terrain generation of ${count * count} chunks took ${elapsed}ms")
-		}
 
-		chunks.forEach { it.generateMesh() }
+			chunks.forEach {
+				withContext(meshingContext) { it.generateMesh() }
+			}
+		}
 	}
 
 	fun dispose() {
@@ -147,14 +160,34 @@ class Terrain {
 	}
 
 	fun update() {
+		KtxAsync.launch {
+			val list = arrayListOf<Deferred<Unit>>()
+
+			chunks.forEach {
+				// If the mesh was changed
+				if (!it.isDirty) return@forEach
+
+				// Re-generate the chunk's mesh
+				list.add(async(meshingContext) { it.generateMesh() })
+
+				// Re-generate the chunk's neighbors meshes
+				it.neighbors.map { neighbor ->
+					list.add(async(meshingContext) { neighbor.generateMesh() })
+				}
+			}
+
+			list.awaitAll()
+		}
 		chunks.forEach {
 			// If the mesh was changed
-			if (it.isDirty) {
+			if (!it.isDirty) return@forEach
+
+			KtxAsync.launch(meshingContext) {
 				// Re-generate the chunk's mesh
 				it.generateMesh()
 
 				// Re-generate the chunk's neighbors meshes
-				it.neighbors.map { neighbor -> neighbor.isDirty = true }
+				//it.neighbors.map { neighbor -> neighbor.isDirty = true }
 			}
 		}
 	}

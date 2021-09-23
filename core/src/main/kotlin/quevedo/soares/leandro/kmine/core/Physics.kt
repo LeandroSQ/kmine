@@ -9,6 +9,10 @@ import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
+import ktx.async.newSingleThreadAsyncContext
 import ktx.math.div
 import quevedo.soares.leandro.kmine.core.models.PhysicsProperties
 import quevedo.soares.leandro.kmine.core.models.PlayerPhysicsProperties
@@ -25,6 +29,8 @@ class Physics {
 	private lateinit var world: btDiscreteDynamicsWorld
 	private lateinit var btSweep3: btAxisSweep3
 	private lateinit var debugDrawer: DebugDrawer
+
+	private val simulationContext = newSingleThreadAsyncContext("Physics-Thread")
 
 	fun onCreate() {
 		this.collisionConfig = btDefaultCollisionConfiguration()
@@ -54,7 +60,9 @@ class Physics {
 	}
 
 	fun update() {
-		world.stepSimulation(Gdx.graphics.deltaTime, SIMULATION_MAX_SUBSTEPS)
+		KtxAsync.launch (simulationContext) {
+			world.stepSimulation(Gdx.graphics.deltaTime, SIMULATION_MAX_SUBSTEPS)
+		}
 	}
 
 	fun dispose() {
