@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import ktx.math.vec2
 import quevedo.soares.leandro.kmine.core.models.FixedSizeCircularQueue
@@ -18,7 +19,7 @@ import quevedo.soares.leandro.kmine.core.utils.use
 import kotlin.math.max
 import kotlin.math.min
 
-private val FONT_SIZE = 46f * Gdx.graphics.density
+private val FONT_SIZE = 35f * Gdx.graphics.density
 
 class HUD {
 
@@ -62,7 +63,7 @@ class HUD {
 	}
 
 	private fun createCamera() {
-		this.camera = OrthographicCamera(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat()).apply {
+		this.camera = OrthographicCamera(Gdx.graphics.width.toFloat() * Gdx.graphics.density, Gdx.graphics.height.toFloat() * Gdx.graphics.density).apply {
 			position.set(viewportWidth / 2f, viewportHeight / 2f, 1f)
 		}
 		this.camera.update()
@@ -82,8 +83,8 @@ class HUD {
 	}
 
 	private fun renderCrosshair() {
-		val thickness = 5f
-		val size = 12.5f
+		val thickness = 5f * Gdx.graphics.density
+		val size = 12.5f * Gdx.graphics.density
 		val centerX = width / 2f
 		val centerY = height / 2f
 
