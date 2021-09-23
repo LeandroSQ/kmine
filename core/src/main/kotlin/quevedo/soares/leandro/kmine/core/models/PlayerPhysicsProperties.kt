@@ -14,11 +14,11 @@ class PlayerPhysicsProperties (dimensions: Vector3, position: Vector3) {
 
 	init {
 		val matrix = Matrix4().apply {
-			setTranslation(position)
+			setTranslation(position.cpy())
 		}
 
 //		this.shape = btBoxShape(dimensions)
-		this.shape = btCapsuleShape(0.45f / 2f, 0.45f / 2f)
+		this.shape = btCapsuleShape(0.45f / 2f, 0.45f)
 
 		this.ghostObject = btPairCachingGhostObject().apply {
 			worldTransform = matrix

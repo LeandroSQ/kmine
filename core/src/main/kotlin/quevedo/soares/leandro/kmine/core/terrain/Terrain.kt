@@ -3,20 +3,25 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.math.Vector3
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import ktx.async.KtxAsync
+import ktx.async.newAsyncContext
+import ktx.async.newSingleThreadAsyncContext
+import ktx.async.onRenderingThread
 import ktx.math.div
 import ktx.math.plus
+import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.Game
+import quevedo.soares.leandro.kmine.core.models.BiomeInfluence
 import quevedo.soares.leandro.kmine.core.terrain.biome.Biome
 import quevedo.soares.leandro.kmine.core.terrain.biome.DefaultBiome
 import quevedo.soares.leandro.kmine.core.terrain.biome.DuneBiome
 import quevedo.soares.leandro.kmine.core.utils.*
 import java.util.*
-import ktx.math.vec3
-import quevedo.soares.leandro.kmine.core.models.BiomeInfluence
+import kotlin.system.measureTimeMillis
 
 private val SEED = Random().nextLong() + System.currentTimeMillis()
 
@@ -40,7 +45,7 @@ class Terrain {
 
 	private inline fun getBiomeAt(position: Vector3) = this.getBiomeAt(position.xInt, position.zInt)
 	private fun getBiomeAt(x: Int, z: Int): Biome {
-		return if (Math.floorMod(x / width  +  z / height, 2) == 0) biomes[0] else biomes[1]
+		return if (Math.floorMod(x / width + z / height, 2) == 0) biomes[0] else biomes[1]
 
 		/*// Calculates the divider, to scarse the x-z values
 		// Therefore making the biome transitioning less often
@@ -72,7 +77,7 @@ class Terrain {
 		return adjacentChunks
 	}
 
-	private fun calculateAdjacentBiomesInfluence (chunkPosition: Vector3, x: Int, z: Int, adjacentChunks: List<Chunk>): List<BiomeInfluence> {
+	private fun calculateAdjacentBiomesInfluence(chunkPosition: Vector3, x: Int, z: Int, adjacentChunks: List<Chunk>): List<BiomeInfluence> {
 		val cubePosition = vec2(chunkPosition.xInt, chunkPosition.zInt) + vec2(x, z)
 
 		return adjacentChunks.map { adjacent ->
@@ -89,7 +94,7 @@ class Terrain {
 		}
 	}
 
-	fun generateChunk(position: Vector3) {
+	suspend fun generateChunk(position: Vector3) {
 		// Fetch the biome for the chunk
 		val biome = this.getBiomeAt(position)
 
@@ -102,39 +107,43 @@ class Terrain {
 			it.neighbors.forEach { other -> other.neighbors.add(it) }
 		}
 
-		runBlocking {
-			// Generates the chunk cubes
-			for (x in 0 until width) {
-				for (z in 0 until depth) {
-					launch {
-						// Calculate the adjacent biomes influence onto the cube
-						val influences = calculateAdjacentBiomesInfluence(position, x, z, chunk.neighbors)
+		// Generates the chunk cubes
+		for (x in 0 until width) {
+			for (z in 0 until depth) {
+				// Calculate the adjacent biomes influence onto the cube
+				val influences = calculateAdjacentBiomesInfluence(position, x, z, chunk.neighbors)
 
-						// Generate a cube strip from the biome
-						val cubeStrip = biome.fill(position.x + x, position.z + z, influences)
+				// Generate a cube strip from the biome
+				val cubeStrip = biome.fill(position.x + x, position.z + z, influences)
 
-						// Set the cube strip to the chunk
-						cubeStrip.forEachIndexed { y, cube ->
-							cube?.position = vec3(x, y, z)
-							chunk.set(x, y, z, cube)
-						}
-					}
+				// Set the cube strip to the chunk
+				cubeStrip.forEachIndexed { y, cube ->
+					cube?.position = vec3(x, y, z)
+					chunk.set(x, y, z, cube)
 				}
 			}
 		}
 
 		// Add it to the chunk list
-		this.chunks.add(chunk)
+		onRenderingThread {
+			chunks.add(chunk)
+		}
 	}
 
 	fun generateBatch(count: Int, origin: Vector3 = Vector3(0f, 0f, 0f)) {
-		/*generateChunk(origin + vec3(0 * width, 0, 0 * depth))
-		generateChunk(origin + vec3(1 * width, 0, 0 * depth))*/
-
-		for (x in 0 until count) {
-			for (z in 0 until count) {
-				generateChunk(origin + vec3(x * width, 0, z * depth))
+		KtxAsync.launch(newSingleThreadAsyncContext("TerrainGenerator-Thread")) {
+			measureTimeMillis {
+				for (x in 0 until count) {
+					for (z in 0 until count) {
+						generateChunk(origin + vec3(x * width, 0, z * depth))
+					}
+				}
+			}.also { elapsed ->
+				println("Initial terrain generation of ${count * count} chunks took ${elapsed}ms")
 			}
+		}.invokeOnCompletion {
+			val dispatcher = newAsyncContext(2, "MeshGenerator-Thread")
+			chunks.forEach { KtxAsync.launch(dispatcher) { it.generateMesh() } }
 		}
 	}
 
@@ -143,24 +152,32 @@ class Terrain {
 		this.biomes.clear()
 	}
 
-	fun render(modelBatch: ModelBatch, environment: Environment) = runBlocking {
-		chunks.forEach {
-			launch {
-				it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
-				if (it.isVisible) it.render(modelBatch, environment)
-			}
+	fun render(modelBatch: ModelBatch, environment: Environment) {
+		this.chunks.filter { it.isVisible }.forEach {
+			it.render(modelBatch, environment)
 		}
 	}
 
 	fun update() {
-		chunks.forEach {
-			// If the mesh was changed
-			if (it.isDirty) {
-				// Re-generate the chunk's mesh
-				it.generateMesh()
+		val dispatcher = newAsyncContext(2, "TerrainGenerator-Thread")
 
-				// Re-generate the chunk's neighbors meshes
-				it.neighbors.forEach { neighbor -> neighbor.generateMesh() }
+		KtxAsync.launch {
+			println("Terrain - update()")
+			chunks.forEach {
+				KtxAsync.launch(dispatcher) {
+					it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
+
+					// If the mesh was changed
+					if (it.isVisible && it.isDirty) {
+						// Re-generate the chunk's mesh
+						it.generateMesh()
+
+						// Re-generate the chunk's neighbors meshes
+						it.neighbors.map { neighbor ->
+							async(dispatcher) { neighbor.generateMesh() }
+						}.awaitAll()
+					}
+				}
 			}
 		}
 	}

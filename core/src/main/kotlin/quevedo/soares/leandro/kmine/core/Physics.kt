@@ -9,14 +9,14 @@ import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
+import ktx.async.newSingleThreadAsyncContext
 import ktx.math.div
-import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.models.PhysicsProperties
 import quevedo.soares.leandro.kmine.core.models.PlayerPhysicsProperties
 import quevedo.soares.leandro.kmine.core.models.RayHit
-import quevedo.soares.leandro.kmine.core.utils.position
 import quevedo.soares.leandro.kmine.core.utils.vec3
-import quevedo.soares.leandro.kmine.core.utils.xInt
 
 private const val SIMULATION_MAX_SUBSTEPS = 5
 
@@ -28,6 +28,7 @@ class Physics {
 	private lateinit var world: btDiscreteDynamicsWorld
 	private lateinit var btSweep3: btAxisSweep3
 	private lateinit var debugDrawer: DebugDrawer
+	private var context = newSingleThreadAsyncContext("Physics-Thread")
 
 	fun onCreate() {
 		this.collisionConfig = btDefaultCollisionConfiguration()
@@ -37,9 +38,9 @@ class Physics {
 		this.world = btDiscreteDynamicsWorld(dispatcher, btSweep3, sequentialImpulseConstraintSolver, collisionConfig).apply {
 			gravity = Vector3(0f, -GRAVITY_FORCE, 0f)
 			dispatchInfo.allowedCcdPenetration = 0.0001f
-			debugDrawer = DebugDrawer().also {
+			/*debugDrawer = DebugDrawer().also {
 				this@Physics.debugDrawer = it
-			}
+			}*/
 		}
 	}
 
@@ -57,9 +58,9 @@ class Physics {
 	}
 
 	fun update() {
-		this.world.stepSimulation(Gdx.graphics.deltaTime, SIMULATION_MAX_SUBSTEPS)
-
-		if (Game.isInDebugMode) this.renderDebug()
+		KtxAsync.launch(this.context) {
+			world.stepSimulation(Gdx.graphics.deltaTime, SIMULATION_MAX_SUBSTEPS)
+		}
 	}
 
 	fun dispose() {

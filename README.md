@@ -2,6 +2,13 @@
 
 A Minecraft clone made in Kotlin
 
+TODO: Re-create the chunk system using layers instead of a 3d-array, therefore not saving useless empty blocks
+TODO: Add multi-thread
+TODO: Fix the biome interpolation
+TODO: Fix the jumping system
+TODO: Re-add the flying camera
+TODO: Add infinite terrain system
+
 ## Development process
 
 ### Day 1

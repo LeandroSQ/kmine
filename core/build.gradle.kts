@@ -11,6 +11,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
 
     implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
     implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
@@ -19,6 +20,7 @@ dependencies {
     // LibKTX kotlin extensions, optional but recommended.
     // The complete list of modules is available at https://github.com/libktx/ktx
     implementation("io.github.libktx:ktx-actors:$ktxVersion")
+    implementation("io.github.libktx:ktx-async:$ktxVersion")
     implementation("io.github.libktx:ktx-assets:$ktxVersion")
     implementation("io.github.libktx:ktx-collections:$ktxVersion")
     implementation("io.github.libktx:ktx-math:$ktxVersion")

@@ -4,9 +4,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g3d.Environment
+import com.badlogic.gdx.graphics.g3d.Material
 import com.badlogic.gdx.graphics.g3d.ModelBatch
+import com.badlogic.gdx.graphics.g3d.Renderable
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
 import com.badlogic.gdx.graphics.g3d.environment.PointLight
+import com.badlogic.gdx.graphics.g3d.model.MeshPart
 import com.badlogic.gdx.math.Vector3
 import ktx.math.plus
 import ktx.math.vec3
@@ -14,10 +19,12 @@ import quevedo.soares.leandro.kmine.core.models.WorldInfoWrapper
 import quevedo.soares.leandro.kmine.core.terrain.Chunk
 import quevedo.soares.leandro.kmine.core.terrain.Cube
 import quevedo.soares.leandro.kmine.core.terrain.Terrain
+import quevedo.soares.leandro.kmine.core.terrain.type.GrassCube
 import quevedo.soares.leandro.kmine.core.terrain.type.TorchCube
 import quevedo.soares.leandro.kmine.core.utils.Gizmo
 import quevedo.soares.leandro.kmine.core.utils.use
 import quevedo.soares.leandro.kmine.core.utils.vec3
+import kotlin.concurrent.thread
 
 class World {
 
@@ -34,8 +41,7 @@ class World {
 		this.setupEnvironment()
 		this.setupSun()
 		this.setupSkybox()
-
-		this.testing()
+		//this.testing()
 	}
 
 	private fun setupTerrain() {
@@ -95,10 +101,10 @@ class World {
 		Gizmo.grid(Vector3(-0.5f, -0.5f, -0.5f), 16f, 20, Color(1f, 0.2f, 0.2f, 1f))
 
 		// Generate the chunks meshes
-		this.terrain.chunks.forEach {
-			it.generateMesh()
-			Gizmo.box(it.center + vec3(-0.5f, -0.5f, -0.5f), it.dimensions, Color(0f, 0f, 1f, 0.25f))
-		}
+//		this.terrain.chunks.forEach {
+			//it.generateMesh()
+//			Gizmo.box(it.center + vec3(-0.5f, -0.5f, -0.5f), it.dimensions, Color(0f, 0f, 1f, 0.25f))
+//		}
 	}
 	// endregion
 
@@ -128,8 +134,6 @@ class World {
 		// Render Gizmos
 		Gizmo.render(this.modelBatch, this.environment)
 
-		this.terrain.update()
-
 		this.modelBatch.use(Game.player.camera) {
 			this.skybox.render(this.modelBatch)
 
@@ -141,6 +145,8 @@ class World {
 
 			Gdx.gl.glDisable(GL20.GL_CULL_FACE)
 			Gdx.gl.glDisable(GL20.GL_DEPTH_TEST)
+
+			Game.player.render(this.modelBatch, this.environment)
 		}
 	}
 

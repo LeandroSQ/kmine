@@ -16,6 +16,10 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import com.badlogic.gdx.physics.bullet.collision.btBvhTriangleMeshShape
 import com.badlogic.gdx.utils.Array
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import ktx.async.KtxAsync
+import ktx.async.onRenderingThread
 import ktx.math.div
 import ktx.math.plus
 import quevedo.soares.leandro.kmine.core.Game
@@ -131,7 +135,7 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	}
 	// endregion
 
-	private fun getNeighborAt(x: Int, z: Int): Chunk? {
+	fun getNeighborAt(x: Int, z: Int): Chunk? {
 		return this.neighbors.firstOrNull {
 			it.position.z == this.position.z + z * depth &&
 					it.position.x == this.position.x + x * width
@@ -171,66 +175,67 @@ class Chunk(val biome: Biome, var position: Vector3, val width: Int, val height:
 	}
 
 	fun generateMesh() {
-		// Dispose previously created assets, if any
-		this.dispose()
+		KtxAsync.launch {
+			// Dispose previously created assets, if any
+			onRenderingThread { dispose() }
 
-		var verticesCount = 0
+			var verticesCount = 0
 
-		val builder = MeshBuilder()
-		builder.begin(MESH_ATTRIBUTES, GL20.GL_TRIANGLES)
+			val builder = MeshBuilder()
+			builder.begin(MESH_ATTRIBUTES, GL20.GL_TRIANGLES)
 
-		// Neighbor mapping
-		val frontNeighbor = this.getNeighborAt(0, 1)
-		val backNeighbor = this.getNeighborAt(0, -1)
-		val leftNeighbor = this.getNeighborAt(-1, 0)
-		val rightNeighbor = this.getNeighborAt(1, 0)
+			// Neighbor mapping
+			val frontNeighbor = getNeighborAt(0, 1)
+			val backNeighbor = getNeighborAt(0, -1)
+			val leftNeighbor = getNeighborAt(-1, 0)
+			val rightNeighbor = getNeighborAt(1, 0)
 
-		cubes.forEach { x, y, z, cube ->
-			// Ignore empty cubes
-			if (cube == EMPTY) return@forEach
+			cubes.forEach { x, y, z, cube ->
+				// Ignore empty cubes
+				if (cube == EMPTY) return@forEach
 
-			// Calculate the cube absolute position
-			val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
+				// Calculate the cube absolute position
+				val offset = floatArrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
-			// Append the faces
-			if (cube.isTranslucent || (shouldDrawFace(x, y + 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.TOP)
-			if (cube.isTranslucent || (shouldDrawFace(x, y - 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.BOTTOM)
+				// Append the faces
+				if (cube.isTranslucent || (shouldDrawFace(x, y + 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.TOP)
+				if (cube.isTranslucent || (shouldDrawFace(x, y - 1, z))) verticesCount += addFace(builder, cube, offset, CubeFace.BOTTOM)
 
-			// Left
-			if (cube.isTranslucent || (shouldDrawFace(x - 1, y, z) && !isNeighborLeftOccluding(leftNeighbor, x, y, z)))
-				verticesCount += addFace(builder, cube, offset, CubeFace.LEFT)
+				// Left
+				if (cube.isTranslucent || (shouldDrawFace(x - 1, y, z) && !isNeighborLeftOccluding(leftNeighbor, x, y, z)))
+					verticesCount += addFace(builder, cube, offset, CubeFace.LEFT)
 
-			// Right
-			if (cube.isTranslucent || (shouldDrawFace(x + 1, y, z) && !isNeighborRightOccluding(rightNeighbor, x, y, z)))
-				verticesCount += addFace(builder, cube, offset, CubeFace.RIGHT)
+				// Right
+				if (cube.isTranslucent || (shouldDrawFace(x + 1, y, z) && !isNeighborRightOccluding(rightNeighbor, x, y, z)))
+					verticesCount += addFace(builder, cube, offset, CubeFace.RIGHT)
 
-			// Front
-			if (cube.isTranslucent || (shouldDrawFace(x, y, z + 1) && !isNeighborFrontOccluding(frontNeighbor, x, y, z)))
-				verticesCount += addFace(builder, cube, offset, CubeFace.FRONT)
+				// Front
+				if (cube.isTranslucent || (shouldDrawFace(x, y, z + 1) && !isNeighborFrontOccluding(frontNeighbor, x, y, z)))
+					verticesCount += addFace(builder, cube, offset, CubeFace.FRONT)
 
-			// Back
-			if (cube.isTranslucent || (shouldDrawFace(x, y, z - 1) && !isNeighborBackOccluding(backNeighbor, x, y, z)))
-				verticesCount += addFace(builder, cube, offset, CubeFace.BACK)
+				// Back
+				if (cube.isTranslucent || (shouldDrawFace(x, y, z - 1) && !isNeighborBackOccluding(backNeighbor, x, y, z)))
+					verticesCount += addFace(builder, cube, offset, CubeFace.BACK)
 
+			}
+
+			onRenderingThread {
+				val mesh = builder.end()
+				// For some reason, the vertices count need to be divided by 2
+				// And using mesh.numVertices simply doesn't work
+				val meshPart = MeshPart("mesh", mesh, 0, verticesCount / 2, GL20.GL_TRIANGLES)
+
+				// Stores the mesh attributes
+				verticesCount = verticesCount
+				indicesCount = verticesCount * 3
+				boundingBox = mesh.calculateBoundingBox().mul(Matrix4().setToTranslation(position))
+
+				// Creates the renderable based on the generated mesh
+				createRenderable(meshPart)
+
+				isDirty = false
+			}
 		}
-
-
-		val mesh = builder.end()
-		// For some reason, the vertices count need to be divided by 2
-		// And using mesh.numVertices simply doesn't works
-		val meshPart = MeshPart("mesh", mesh, 0, verticesCount / 2, GL20.GL_TRIANGLES)
-
-		// Stores the mesh attributes
-		this.verticesCount = verticesCount
-		this.indicesCount = verticesCount * 3
-		this.boundingBox = mesh.calculateBoundingBox().mul(Matrix4().setToTranslation(this.position))
-
-		// Creates the renderable based on the generated mesh
-		this.createRenderable(meshPart)
-
-		// Gizmo.directionArrows(this.center, this.dimensions / 2f)
-
-		this.isDirty = false
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {

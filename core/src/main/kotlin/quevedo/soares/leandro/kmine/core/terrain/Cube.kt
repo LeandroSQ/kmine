@@ -43,6 +43,7 @@ abstract class Cube {
 	open val bottomNormal get() = Cube.bottomNormal
 	open val bottomFace get() = Cube.bottomFace
 
+	@Suppress("GDXKotlinStaticResource")
 	companion object {
 
 		// region Normals
@@ -105,8 +106,15 @@ abstract class Cube {
 		// endregion
 
 		// region Textures
-		val atlas: TextureAtlas = TextureAtlas(Gdx.files.local("cubes.atlas"))
-		val texture: Texture = atlas.textures.first()
+		lateinit var atlas: TextureAtlas
+			private set
+		lateinit var texture: Texture
+			private set
+
+		fun loadTextures() {
+			this.atlas = TextureAtlas(Gdx.files.local("cubes.atlas"))
+			this.texture = this.atlas.textures.first()
+		}
 
 		fun disposeTextures() {
 			texture.dispose()

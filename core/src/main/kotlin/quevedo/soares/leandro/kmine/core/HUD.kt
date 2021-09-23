@@ -10,9 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.math.MathUtils.floor
+import com.badlogic.gdx.math.Vector2
 import ktx.math.vec2
 import quevedo.soares.leandro.kmine.core.models.FixedSizeCircularQueue
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
+import quevedo.soares.leandro.kmine.core.utils.add
 import quevedo.soares.leandro.kmine.core.utils.clamp
 import quevedo.soares.leandro.kmine.core.utils.humanFriendlyFormat
 import quevedo.soares.leandro.kmine.core.utils.use
@@ -137,7 +140,6 @@ class HUD {
 		}
 	}
 
-	@OptIn(ExperimentalUnsignedTypes::class)
 	private fun renderFrameTimeGraph() {
 		this.shapeRenderer.use {
 			val barSize = this.camera.viewportWidth / this.frameTimeQueue.size.toFloat()
