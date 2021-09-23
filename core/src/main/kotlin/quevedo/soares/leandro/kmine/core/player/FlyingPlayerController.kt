@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector3
 import ktx.math.times
+import quevedo.soares.leandro.kmine.core.Game
 
 class FlyingPlayerController(private val player: Player) : BasePlayerController() {
 
@@ -36,12 +37,22 @@ class FlyingPlayerController(private val player: Player) : BasePlayerController(
 		val speed = SPEED * Gdx.graphics.deltaTime * speedMultiplier
 
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			this.player.camera.rotate(this.player.camera.up, (speed * Math.PI * 3).toFloat())
+			this.player.camera.direction.rotate(this.player.camera.up, (speed * Math.PI * 3).toFloat())
 			this.player.isCameraDirty = true
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			this.player.camera.rotate(this.player.camera.up, -(speed * Math.PI * 3).toFloat())
+			this.player.camera.direction.rotate(this.player.camera.up, -(speed * Math.PI * 3).toFloat())
+			this.player.isCameraDirty = true
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+			this.player.camera.rotate(this.player.camera.direction.cpy().crs(this.player.camera.up).nor(), (speed * Math.PI * 3).toFloat())
+			this.player.isCameraDirty = true
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+			this.player.camera.rotate(this.player.camera.direction.cpy().crs(this.player.camera.up).nor(), -(speed * Math.PI * 3).toFloat())
 			this.player.isCameraDirty = true
 		}
 
@@ -51,10 +62,10 @@ class FlyingPlayerController(private val player: Player) : BasePlayerController(
 		if (Gdx.input.isKeyPressed(Input.Keys.D))
 			translateCamera(this.player.camera.direction.cpy().crs(this.player.camera.up).nor() * speed)
 
-		if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W))
+		if (Gdx.input.isKeyPressed(Input.Keys.W))
 			translateCamera(this.player.camera.direction.cpy() * speed)
 
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S))
+		if (Gdx.input.isKeyPressed(Input.Keys.S))
 			translateCamera(this.player.camera.direction.cpy() * -speed)
 
 		if (Gdx.input.isKeyPressed(Input.Keys.SPACE))
@@ -69,7 +80,7 @@ class FlyingPlayerController(private val player: Player) : BasePlayerController(
 	}
 
 	override fun update() {
-		if (this.player.isCapturingInput) {
+		if (Game.isCapturingInput) {
 			this.handleMovementInput()
 			this.handleMouseInput()
 		}

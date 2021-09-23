@@ -6,14 +6,8 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.physics.bullet.Bullet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import ktx.async.KTX
-import ktx.async.KtxAsync
-import ktx.async.onRenderingThread
 import quevedo.soares.leandro.kmine.core.player.Player
 import quevedo.soares.leandro.kmine.core.terrain.Cube
-import java.util.concurrent.LinkedBlockingQueue
 
 private val ANTIALIASING by lazy { if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0 }
 
@@ -31,10 +25,11 @@ object Game : ApplicationAdapter() {
 	var physics = Physics()
 
 	var isInDebugMode = true
+	var isCapturingInput = true
+		private set
 
 	override fun create() {
 		Bullet.init()
-		KtxAsync.initiate()
 		Cube.loadTextures()
 
 		this.physics.onCreate()
@@ -43,32 +38,47 @@ object Game : ApplicationAdapter() {
 		this.hud.onCreate()
 	}
 
+	private fun handleInputCapture() {
+		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+			this.isCapturingInput = true
+			Gdx.input.isCursorCatched = true
+		}
+
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit()
+		}
+	}
+
 	private fun handleKeyInput() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			Gdx.input.isCursorCatched = false
+			isCapturingInput = false
+		}
+
 		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
 			this.isInDebugMode = !this.isInDebugMode
 		}
 	}
 
 	override fun render() {
-		KtxAsync.launch (Dispatchers.KTX) {
+		val start = System.currentTimeMillis()
 
-			val start = System.currentTimeMillis()
+		HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
 
-			HdpiUtils.glViewport(0, 0, Gdx.graphics.width, Gdx.graphics.height)
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT or ANTIALIASING)
+		if (isCapturingInput) this.handleKeyInput()
+		else this.handleInputCapture()
 
-			handleKeyInput()
+		this.physics.update()
+		this.player.update()
 
-			physics.update()
-			player.update()
+		this.world.render()
+		this.hud.render()
 
-			world.render()
-			hud.render()
-
+		if(isInDebugMode) {
 			val end = System.currentTimeMillis()
 			val frameTime = (end - start).toShort()
-			hud.frameTimeQueue.push(frameTime)
-
+			this.hud.frameTimeQueue.push(frameTime)
 		}
 	}
 

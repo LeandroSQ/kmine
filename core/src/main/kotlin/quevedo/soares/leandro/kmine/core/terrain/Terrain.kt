@@ -3,14 +3,6 @@ package quevedo.soares.leandro.kmine.core.terrain
 import com.badlogic.gdx.graphics.g3d.Environment
 import com.badlogic.gdx.graphics.g3d.ModelBatch
 import com.badlogic.gdx.math.Vector3
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
-import ktx.async.newAsyncContext
-import ktx.async.newSingleThreadAsyncContext
-import ktx.async.onRenderingThread
 import ktx.math.div
 import ktx.math.plus
 import ktx.math.vec3
@@ -94,7 +86,7 @@ class Terrain {
 		}
 	}
 
-	suspend fun generateChunk(position: Vector3) {
+	fun generateChunk(position: Vector3) {
 		// Fetch the biome for the chunk
 		val biome = this.getBiomeAt(position)
 
@@ -125,26 +117,21 @@ class Terrain {
 		}
 
 		// Add it to the chunk list
-		onRenderingThread {
-			chunks.add(chunk)
-		}
+		chunks.add(chunk)
 	}
 
 	fun generateBatch(count: Int, origin: Vector3 = Vector3(0f, 0f, 0f)) {
-		KtxAsync.launch(newSingleThreadAsyncContext("TerrainGenerator-Thread")) {
-			measureTimeMillis {
-				for (x in 0 until count) {
-					for (z in 0 until count) {
-						generateChunk(origin + vec3(x * width, 0, z * depth))
-					}
+		measureTimeMillis {
+			for (x in 0 until count) {
+				for (z in 0 until count) {
+					generateChunk(origin + vec3(x * width, 0, z * depth))
 				}
-			}.also { elapsed ->
-				println("Initial terrain generation of ${count * count} chunks took ${elapsed}ms")
 			}
-		}.invokeOnCompletion {
-			val dispatcher = newAsyncContext(2, "MeshGenerator-Thread")
-			chunks.forEach { KtxAsync.launch(dispatcher) { it.generateMesh() } }
+		}.also { elapsed ->
+			println("Initial terrain generation of ${count * count} chunks took ${elapsed}ms")
 		}
+
+		chunks.forEach { it.generateMesh() }
 	}
 
 	fun dispose() {
@@ -153,31 +140,21 @@ class Terrain {
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {
-		this.chunks.filter { it.isVisible }.forEach {
-			it.render(modelBatch, environment)
+		this.chunks.forEach {
+			it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
+			if (it.isVisible) it.render(modelBatch, environment)
 		}
 	}
 
 	fun update() {
-		val dispatcher = newAsyncContext(2, "TerrainGenerator-Thread")
+		chunks.forEach {
+			// If the mesh was changed
+			if (it.isDirty) {
+				// Re-generate the chunk's mesh
+				it.generateMesh()
 
-		KtxAsync.launch {
-			println("Terrain - update()")
-			chunks.forEach {
-				KtxAsync.launch(dispatcher) {
-					it.isVisible = Game.player.camera.frustum.boundsInFrustum(it.boundingBox)
-
-					// If the mesh was changed
-					if (it.isVisible && it.isDirty) {
-						// Re-generate the chunk's mesh
-						it.generateMesh()
-
-						// Re-generate the chunk's neighbors meshes
-						it.neighbors.map { neighbor ->
-							async(dispatcher) { neighbor.generateMesh() }
-						}.awaitAll()
-					}
-				}
+				// Re-generate the chunk's neighbors meshes
+				it.neighbors.map { neighbor -> neighbor.isDirty = true }
 			}
 		}
 	}

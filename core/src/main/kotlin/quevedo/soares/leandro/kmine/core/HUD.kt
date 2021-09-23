@@ -8,19 +8,14 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils.floor
-import com.badlogic.gdx.math.Vector2
 import ktx.math.vec2
 import quevedo.soares.leandro.kmine.core.models.FixedSizeCircularQueue
 import quevedo.soares.leandro.kmine.core.shader.HUDShader
-import quevedo.soares.leandro.kmine.core.utils.add
 import quevedo.soares.leandro.kmine.core.utils.clamp
 import quevedo.soares.leandro.kmine.core.utils.humanFriendlyFormat
 import quevedo.soares.leandro.kmine.core.utils.use
 import kotlin.math.max
-import kotlin.math.min
 
 private val FONT_SIZE = 35f * Gdx.graphics.density
 

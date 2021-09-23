@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Quaternion
 import com.badlogic.gdx.math.Vector3
-import ktx.math.times
 import ktx.math.vec3
 import quevedo.soares.leandro.kmine.core.utils.Gizmo
 import quevedo.soares.leandro.kmine.core.utils.createQuad

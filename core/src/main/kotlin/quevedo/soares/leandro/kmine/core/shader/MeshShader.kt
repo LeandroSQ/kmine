@@ -1,16 +1,10 @@
 package quevedo.soares.leandro.kmine.core.shader
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g3d.Renderable
 import com.badlogic.gdx.graphics.g3d.Shader
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute
-import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader
-import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
-import com.badlogic.gdx.utils.GdxRuntimeException
-import quevedo.soares.leandro.kmine.core.utils.position
 
 class MeshShader(private val renderable: Renderable) : BaseShader() {
 

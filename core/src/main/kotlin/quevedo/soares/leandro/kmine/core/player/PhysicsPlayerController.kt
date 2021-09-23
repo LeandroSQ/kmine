@@ -139,7 +139,7 @@ class PhysicsPlayerController(private val player: Player) : BasePlayerController
 		}
 
 		// Handles input
-		if (this.player.isCapturingInput) {
+		if (Game.isCapturingInput) {
 			// Apply air friction
 			this.velocity.x = 0f
 			this.velocity.y *= AIR_FRICTION

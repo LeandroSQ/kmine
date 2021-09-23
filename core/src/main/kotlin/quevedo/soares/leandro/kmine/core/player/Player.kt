@@ -9,10 +9,12 @@ import com.badlogic.gdx.graphics.VertexAttributes
 import com.badlogic.gdx.graphics.g3d.*
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
+import com.badlogic.gdx.math.MathUtils.floor
 import com.badlogic.gdx.math.Vector3
 import ktx.math.plus
 import ktx.math.times
 import ktx.math.vec3
+import quevedo.soares.leandro.kmine.core.Game
 import quevedo.soares.leandro.kmine.core.utils.vec3
 
 private const val FOV = 67f
@@ -31,8 +33,6 @@ class Player {
 		}
 
 	internal var isCameraDirty = false
-
-	internal var isCapturingInput = true
 
 	lateinit var camera: PerspectiveCamera
 		private set
@@ -76,29 +76,13 @@ class Player {
 	private fun generateInitialPosition() {
 		// Positions the player
 		this.position = Vector3.Y * dimensions.y + 10
-		/*val chunk = Game.world.terrain.chunks.random()
+		val chunk = Game.world.terrain.chunks.random()
 		chunk.getHighest(floor(chunk.width / 2f), floor(chunk.depth / 2f))?.let {
 			this.position = chunk.position + it.position + Vector3.Y * dimensions.y * 10
-		}*/
-	}
-
-	private fun handleInputCapture() {
-		if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-			this.isCapturingInput = true
-			Gdx.input.isCursorCatched = true
-		}
-
-		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-			Gdx.app.exit()
 		}
 	}
 
 	private fun handleInput() {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-			Gdx.input.isCursorCatched = false
-			isCapturingInput = false
-		}
-
 		if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
 			this.isFlying = !this.isFlying
 			this.controller.activate()
@@ -109,10 +93,8 @@ class Player {
 		isCameraDirty = false
 		controller.update()
 
-		if (isCapturingInput) {
+		if (Game.isCapturingInput) {
 			handleInput()
-		} else {
-			handleInputCapture()
 		}
 
 		if (isCameraDirty) {
@@ -121,7 +103,7 @@ class Player {
 	}
 
 	fun render(modelBatch: ModelBatch, environment: Environment) {
-		//if (this.isCubeOutlineVisible) modelBatch.render(this.cubeOutline, environment)
+		if (this.isCubeOutlineVisible) modelBatch.render(this.cubeOutline, environment)
 	}
 
 	fun dispose() {

@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.physics.bullet.collision.*
 import com.badlogic.gdx.physics.bullet.dynamics.btKinematicCharacterController
-import ktx.math.div
 
 class PlayerPhysicsProperties (dimensions: Vector3, position: Vector3) {
 

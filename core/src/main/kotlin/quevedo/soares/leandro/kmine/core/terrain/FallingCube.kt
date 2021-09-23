@@ -1,18 +1,5 @@
 package quevedo.soares.leandro.kmine.core.terrain
 
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.VertexAttributes
-import com.badlogic.gdx.graphics.g3d.*
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.physics.bullet.collision.btCollisionObject
-import com.badlogic.gdx.physics.bullet.collision.btBoxShape
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody
-import com.badlogic.gdx.physics.bullet.linearmath.btDefaultMotionState
-import quevedo.soares.leandro.kmine.core.utils.addQuad
-
 const val GRAVITY = 0.1f
 
 open class FallingCube {

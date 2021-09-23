@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.math.collision.BoundingBox
 import ktx.math.*
 import quevedo.soares.leandro.kmine.core.Game
-import quevedo.soares.leandro.kmine.core.utils.vec3
 
 object Gizmo {
 
