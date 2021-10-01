@@ -68,7 +68,7 @@ And smoother camera movement
 
 ### Day 4
 To start, I just wanna share a video on how to project is going so far.
-![Day 4 - 0](./.github/day4_0.mp4)
+[Click to see the video](./.github/day4_0.mp4)
 
 Basically I worked in rewriting the chunk system, but to made usage of the Renderable class
 This would allow me to apply shaders at the chunk mesh
@@ -88,3 +88,13 @@ Resumed the work on the Physics engine, after successfully creating a tile based
 After many and many bugs, managed to make it work with the player.
 After that I've made a simple raycast system and created the system to allow player to break and place cubes
 ![Day 6 - 0](./.github/day6_0.png)
+
+### Day 7
+- Added Ansiotropic filtering.
+- Added Threading system, Physics and Terrain generation now have one separated thread.
+- Added fixed time step for physic simulation.
+- Added GLProfiler.
+- Added smooth jumping.
+- Added simple sprinting.
+- Failed to create a sun lol, who would've thought that creating a sun would be such a hassle.
+- Refactoring and chunk arrangement optimization, before I've assinged each chunk with its position in the world. Therefore searching for a chunk in given position would imply checking visible chunks and its bounding box. Changed to hashmap as for now each chunk receives an unique hash representing its world position. Constant lookup times.
